@@ -1,0 +1,52 @@
+- - - ( MVC the Laravel Way ) - - -
+
+
+** ( Model ):
+
+- "process" & "store data", that could be "stored" in a 
+  "database", "other data structure" or "storage systems"
+
+  {model} usally communicates w/{controller},
+  but it also could communicate w/{view}
+
+
+- {model} represents "data structures" & "handles" 
+  "data interaction" usually w/"database"
+
+
+- "Laravel", uses an ORM called "Eloquent", 
+   which "abstracts" "database interactions",
+   using "active record pattern" 
+
+
+
+** ( View ):
+
+- {view} is all about "presentation", it's 
+  "essentially" what the user "sees" & "interacts"
+  
+  
+- in "laravel", "view" are built using "blade templating engine"
+
+
+
+** ( Controller ):  
+
+- it's the middle between {View} & {Model}, it...
+→ handles user requests
+→ processes requests, by talking to {Model(s)}
+→ then, sends data back to browser, by loading {view}
+
+
+- {controller}, is where you write "logic", that 
+  "handles" "user input" & "interaction"
+
+
+- when user performs an action( e.g.. "Form submission"),
+→ request captured by laravel's router
+→ then, router directs it through necessary middlewares
+→ then, reaches appropriate controller 
+→ then controller might...        
+  1) validate the data  
+  2) interact w/model, to retrieve or store data    
+  3) prepare a response ( response is typically a view, loaded from controller )
