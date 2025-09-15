@@ -38,8 +38,8 @@
 → then, sends data back to browser, by loading {view}
 
 
-- {controller}, is where you write "logic", that 
-  "handles" "user input" & "interaction"
+- {controller}, is where you write "logic" that "handles", 
+  "user input" & "interaction"
 
 
 - when user performs an action( e.g.. "Form submission"),

@@ -1,0 +1,168 @@
+- - - ( Request_Lifecycle ) - - -  
+
+** ( public/index.php ):
+
+- the entry point for all "requests" -> "Laravel Application"
+
+- a starting point for loading the rest of the framework
+
+
+* ( Sequence ):   
+
+→ loads the "Composer" generated autoloader definition    
+
+→ retrieves an "instance" of the "Laravel application",
+  from "bootstrap/app.php"
+
+
+
+
+- - - ( HTTP / Console Kernels ) - - -
+
+- {HTTP kernel} is an instance of "Illuminate\Foundation\Http\Kernel"
+
+
+- using the {handleRequest} / {handleCommand} methods,
+  of the "application instance"(from "bootstrap/app.php")
+
+  "incoming request" is sent to either "HTTP kernel" / "Console kernel"
+  ( depending request type entering the application )
+
+  These "two kernels", serve as the "central location", 
+  through which all "requests flow"
+
+
+-  {HTTP kernel} defines an "array of bootstrappers", that will "run",
+   before "request" is "executed", "bootstrappers"...
+  • configure error handling
+  • configure logging
+  • detect the application environment
+
+  & "performs tasks", needed to be done, "before request" is handled.
+  These "classes" handle "Internal Laravel Configuration"
+
+
+- {HTTP kernel} is responsible for "passing request" through 
+  "application's middleware stack", These {middleware} handles...
+  • reading & writing the HTTP session
+  • determining if application's in maintenance mode
+  • verifying the CSRF token
+  and more...
+
+
+- The method signature for HTTP kernel's handle method is,
+  it receives "Request" & "Returns Response"
+  
+  kernel is like a "black box" that represents the "entire application",
+  Feed it HTTP requests and it will return HTTP responses
+
+
+
+
+- - - ( Service Providers ) - - - 
+
+- One of the most important "kernel bootstrapping actions" is, 
+  loading "service providers" for your application
+
+
+- "Service providers" are responsible for "bootstrapping" 
+  all of the "framework's various components", e.g.. 
+  • database
+  • queue
+  • validation
+  • routing components
+
+
+- "Laravel" will iterate through this list of "providers",
+  and "instantiate" each of them,
+
+  After "instantiating providers", "register method" 
+  will be called on all of the "providers"
+
+  Once all providers have been registered, "boot method" 
+  will be called on each "provider"
+
+
+  ( Summary Sequence ):
+  → Laravel "iterates" list of "providers", "instantiates" each of them
+  → "register method" is called on each "provider" 
+  → "boot method" is called on each "provider" 
+
+  
+  ( Summary ):    
+  it's done so by the time "boot method" is "executed",
+  "service providers" may depend on every "container binding" 
+  that are / being "registered & available"
+
+
+- "major features" offered by Laravel is, 
+  "bootstrapped" & "configured" by a "service provider"
+
+   you also have the "option" to "create" your own
+
+   w/"bootstrap/providers.php file", You can find lists of 
+   "user-defined" or "third-party" service providers, that 
+   your application is using
+
+
+
+
+- - - ( Routing ) - - -
+
+- Once {application} has been "bootstrapped" 
+  & all {service providers} are "registered",
+  "Request" is handed off to the "router" for "dispatching"
+
+  {Router} will...
+  • "dispatch request" to a "route / controller"
+  • "run" any "route specific middleware"
+
+
+- {Middleware} "provides mechanisms" for "filtering / examining" 
+  "HTTP requests" entering your application, e.g..
+  • User Authentication: 
+    IF authenticated, allow the "request" to proceed
+    ELSE, "redirect" the user to the login screen
+
+  Some "middleware", are assigned to "all routes" ( e.g.. "PreventRequestsDuringMaintenance" )
+  while some are only assigned to "specific routes / route groups"
+
+
+  ( Sequence ): 
+  - If the "Request" successfully "passes" every "middleware" attached 
+    to its "matched route"...
+
+  → "Route / Controller method" will be "executed" 
+    ( in which will return a "response" )
+
+  → "Response" returned, will be sent back through "route's" chain of "middleware"
+
+  → "Response" travels back outward through "route's middleware"  
+    ( giving applications a chance to modify / examine outgoing response )
+
+  → Then, "HTTP kernel's" {handle method}, returns "response object"
+    to the {handleRequest}( of "application instance" )
+
+  → The {handleRequest method}, calls the {send method} on "returned response" 
+
+  → {Send method} sends the "response content" to the user's "web browser"
+
+
+
+
+- - - ( Focus on Service Providers ) - - -   
+
+- Service providers are the key to bootstrapping a Laravel application. 
+  • "Application Instance" → "created"
+  • "Service providers" → "registered"
+  • "Request" → "bootstrapped application"
+
+
+- Our application's "user-defined service providers" are "stored" in {app/Providers directory},
+
+  By default {AppServiceProvider} is "empty", the "provider" is a great place 
+  to "add" your application's "own bootstrapping & service container bindings"
+
+  (Tip):  
+  For large applications, you may wish to create "several service providers", 
+  each with more granular "bootstrapping" for "specific services" used by your "application"

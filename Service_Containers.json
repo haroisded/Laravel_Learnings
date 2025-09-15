@@ -1,0 +1,95 @@
+- - - ( Service Container ) - - -
+
+- Laravel service container a tool that... 
+  • manages class dependencies 
+  • performs dependency injection
+
+
+- Dependency injection simply means,
+  
+  "class dependencies" are "injected" to the class by...
+  • constructor
+  • setter methods 
+
+
+( Sample Code ):   
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\AppleMusic;
+use Illuminate\View\View;
+
+
+class PodcastController extends Controller {
+    
+    // Create a new controller instance ( Inject Service ). 
+    public function __construct(
+        protected AppleMusic $apple,
+    ) {}
+
+    
+    // Show information about the given podcast 
+    // ( Dummy Implementation of the Applemusic Service, use to retrieve podcasts )
+    public function show(string $id): View
+    {
+        return view(
+        'podcasts.show', ['podcast' => $this->apple->findPodcast($id)]
+        );
+    }
+
+}
+
+
+- in this example...
+
+• PodcastController needs to retrieve podcasts from Apple Music
+
+• we will inject a service that is able to retrieve podcasts
+
+• Since service is injected, we are able to easily "mock", or create 
+  a dummy implementation of the AppleMusic service
+
+
+
+** ( Zero Configuration Resolution ):
+
+- If a class has...  
+• no dependencies 
+• only depends on other "concrete classes" (not interfaces)
+  "container" does not need to be instructed on how to "resolve" that "class"
+
+
+( Sample Code ):    
+
+<?php
+
+class Service
+{
+    // ...
+}
+
+Route::get('/', function (Service $service) {
+    dd($service::class);
+});
+
+
+- in this example...
+• hitting your application's "/" route will automatically resolve 
+  the "Service class" and "inject" it into your route's handler
+
+
+- many of the "classes" you will be "writing" when building Laravel applications 
+  "automatically receive" their "dependencies" via "container", including...
+  • controllers
+  • event listeners
+  • middleware 
+  • more... 
+
+
+- you may "type-hint" dependencies in the "handle method" of "queued jobs"
+
+
+
+** ( When to Utilize the Container ):   
