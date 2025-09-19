@@ -1,0 +1,287 @@
+- - - ( Laravel Architecture ) - - -
+
+
+** ( Understanding {index.php} ):
+
+- Entry point of all "web requests"
+
+- "Bootstraps" the framework & calls
+
+
+* ( Code ):    
+
+ use Illuminate\Foundation\Application;
+ use Illuminate\Http\Request;
+
+ define('LARAVEL_START', microtime(true));
+
+ // Determine if the application is in maintenance mode...
+ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+     require $maintenance;
+ }
+
+ // Register the Composer autoloader...
+ require __DIR__.'/../vendor/autoload.php';
+
+ // Bootstrap Laravel and handle the request...
+ /** @var Application $app */
+ $app = require_once __DIR__.'/../bootstrap/app.php';
+
+ $app->handleRequest(Request::capture());
+
+
+
+* ( Bootstrap/app.php in index.php explanation ):   
+
+ $app = require_once __DIR__.'/../bootstrap/app.php'; 
+ // Creates an instance of the "Illuminate\Foundation\Application"
+
+
+ $app -> handleRequest(Request::capture());
+ // Captures the "Requests", using the method 
+
+
+
+
+** ( Understanding {Illuminate\Foundation\Application}):    
+
+- "Illuminate\Foundation\Application", is the "Service Container"   
+
+
+- It contains "services" that are "registered(Instantiated)",
+
+  e.g.. "App\HTTP\Kernel", where "handleRequest(Request::capture())"
+         is originally from 
+
+
+- By creating an "instance" of the "application", we're able to use 
+  "services" that are "registered" within the "application/container" 
+
+
+
+
+** ( Understanding {Bootstrap App.php}):   
+
+- The "Bootstrap's app.php"...
+• initializes application object / "Service Container"
+• Prepares for Booting
+
+
+
+* ( Code of app.php ):
+
+ use Illuminate\Foundation\Application;
+ use Illuminate\Foundation\Configuration\Exceptions;
+ use Illuminate\Foundation\Configuration\Middleware;
+
+
+ return Application::configure(basePath: dirname(__DIR__))
+     ->withRouting(
+         web: __DIR__.'/../routes/web.php',
+         commands: __DIR__.'/../routes/console.php',
+         health: '/up',
+     )
+     ->withMiddleware(function (Middleware $middleware): void {
+         //
+     })
+     ->withExceptions(function (Exceptions $exceptions): void {
+         //
+     })->create();
+
+
+
+
+** ( Understanding {Handle Request Method}):  
+
+- handle request method purpose...   
+• After running through the "application logic"
+• It's Responsible for taking incoming "HTTP Requests" 
+• then Converting "Requests" -> "Response"
+
+
+- The "handleRequest(Request::capture());" under,
+  "application.php", handles the "request" using 
+  "HTTP Kernel", code...
+
+  the "method" that "handles requests", is 
+  "originally" from the "kernel"
+
+  but by using the "contract(Interface)", 
+  we're able to use it in the "application.php"
+
+  The actual "implementation" is the "kernel" from "HTTP Dir",
+  or "Illuminate\Foundation\Http\Kernel.php"
+ 
+
+
+
+** ( Understanding {Request Handling Sequence} ):   
+
+1) {Request} is Captured by... 
+
+   // Called in index.php, but the implementation is in "application.php"
+   → $app->handleRequest(Request::capture());
+
+   // The Implementaion in "application.php (Illuminate\Foundation\Application)"
+   → public function handleRequest(Request $request){...}
+
+
+
+2) after {Request} is passed to, "handleRequest(Request $request){...}",
+   this method passes the {Request} to...    
+   
+   // Called under the handleRequest(){...} method, but the implementation is in "kernel.php"
+   → $response = $kernel->handle($request)->send();
+
+   // The Implementation in "kernel.php (Illuminate\Foundation\Http)"
+   → public function handle($request){...}
+
+
+
+3) after {Request} is passed to, "handle($request){...}",
+   this method passes the {Request} to...
+
+   // Called under the handle($request){...} method, but the implementation is also in "kernel.php"
+   → $response = $this->sendRequestThroughRouter($request);
+
+   // The Implementation is in the same namespace, but different method
+   → protected function sendRequestThroughRouter($request){...}
+
+
+
+4) after Request is passed to, "sendRequestThroughRouter($request){...}",
+   "this" method...
+    • sends {Request} to the "application middleware stack" 
+    • then, dispatches {Request} to the "matched router" 
+    • then, {Request} will run through "route specific middleware"
+    • then finally, {Request} is sent to a "Route Action / Controller"
+
+
+   //Code: 
+   → protected function sendRequestThroughRouter($request)
+    {
+     $this->app->instance('request', $request);
+
+     Facade::clearResolvedInstance('request');
+
+     $this->bootstrap();
+
+     return (new Pipeline($this->app)) 
+         ->send($request)
+         ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware) //app middleware stack
+         ->then($this->dispatchToRouter()); //request dispatched to router
+     }
+
+
+
+
+** ( Understanding {Middleware} ):
+
+- "Laravel Middleware", acts as a gatekeeper that...
+  • inspects 
+  • filters 
+  • decides
+
+  if the "request" must "proceed" into "application / not" 
+
+  it can "redirect" requests based on conditions, e.g..   
+  • user authentication
+  • authorization
+  • etc... 
+
+
+- "Middlewares" can be applied "globally" / "specifc routes",
+  IF: 
+  "request" successfully "passes" through all, "matched" route's 
+  "middlewares"
+  
+  the "route / controller method", "executes" & "response"
+  is sent back through the "middleware chain" 
+
+
+
+
+** ( Understanding {bootsrap()} ):
+
+- before request is sent to the router, this method is called
+  ( under the, sendRequestThroughRouter($request){...} )
+  
+  method: "$this->bootstrap();" 
+  
+  it's responsible for "configuring & bootstrapping" important 
+  parts of the framework, e.g.. Error handling, logging etc...
+
+
+  //The actual Implementations of bootstrap, under in kernel.php (Illuminate\Foundation\Http)
+1) Executes the bootstrapping process (if not done yet)
+• Checks if the application has already been bootstrapped (hasBeenBootstrapped())
+• If not, it runs all the bootstrappers by calling bootstrapWith() and passing them in
+
+
+→ public function bootstrap() {
+     if (! $this->app->hasBeenBootstrapped()) {
+     $this->app->bootstrapWith($this->bootstrappers());
+    }
+   }
+
+
+
+2) Provides the list of classes that will be "bootstrapped"
+• Just returns the list/array of bootstrapper classes 
+  e.g.. LoadEnvironmentVariables, HandleExceptions, RegisterProviders, etc...
+
+
+→ protected function bootstrappers(){ 
+    return $this->bootstrappers; 
+  }
+
+
+
+3) The actual "bootstrapper classes", that laravel bootstraps 
+   in order to prepare the framework
+
+
+→ protected $bootstrappers = [
+   \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
+   \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+   \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+   \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+   \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+   \Illuminate\Foundation\Bootstrap\BootProviders::class,
+  ];
+
+
+  ( Deep explanation of each Bootstrapper Classes ):    
+
+• ( "LoadEnvironmentVariables" ):
+  Loads values from your {.env} file into PHP's environment 
+  so they can be read by the config system
+
+  
+• ( "LoadConfiguration" ):
+  Loads all the configuration files from {config/} & puts 
+  them into the application's config repository
+
+
+• ( "HandleExceptions" ):
+  Registers and configures Laravel's exception handler 
+  so errors are caught & rendered nicely
+
+
+• ( "RegisterFacades" ):
+  Sets up the Facade system (links Facades to the service container)
+
+
+• ( "RegisterProviders" ):
+  Registers all of your application's service providers (from {config/app.php})
+
+
+• ( "BootProviders" ):
+  Calls the {boot()} method on every registered service provider
+
+
+
+
+** ( Understanding {Service Providers} ):
+
+- 
