@@ -3,9 +3,9 @@
 
 ** ( Understanding {index.php} ):
 
-- Entry point of all "web requests"
-
 - "Bootstraps" the framework & calls
+
+- Entry point of all "web requests"
 
 
 * ( Code ):    
@@ -115,7 +115,7 @@
 
 
 
-** ( Understanding {Request Handling Sequence} ):   
+** ( Understanding {"Web Request" Handling Sequence} ):   
 
 1) {Request} is Captured by... 
 
@@ -130,7 +130,13 @@
 2) after {Request} is passed to, "handleRequest(Request $request){...}",
    this method passes the {Request} to...    
    
-   // Called under the handleRequest(){...} method, but the implementation is in "kernel.php"
+   /*
+   Called under the handleRequest(){...} method, but the implementation is in "kernel.php"
+   also... 
+   → after route/controller method, generates a response, it moves outward through route's middleware,
+   → then the send(); method is invoked on the response object( returned by handle(); method ),
+   → then the final response is then delivered to the user's web browser, completing the lifecycle 
+   */  
    → $response = $kernel->handle($request)->send();
 
    // The Implementation in "kernel.php (Illuminate\Foundation\Http)"
@@ -177,7 +183,7 @@
 
 ** ( Understanding {Middleware} ):
 
-- "Laravel Middleware", acts as a gatekeeper that...
+- "Laravel Middleware", acts as a "gatekeeper" that...
   • inspects 
   • filters 
   • decides
@@ -191,6 +197,7 @@
 
 
 - "Middlewares" can be applied "globally" / "specifc routes",
+  
   IF: 
   "request" successfully "passes" through all, "matched" route's 
   "middlewares"
@@ -203,20 +210,19 @@
 
 ** ( Understanding {bootsrap()} ):
 
-- before request is sent to the router, this method is called
+- before request is sent to the router, this method is called,
+  method: "$this->bootstrap();"
   ( under the, sendRequestThroughRouter($request){...} )
-  
-  method: "$this->bootstrap();" 
-  
+ 
   it's responsible for "configuring & bootstrapping" important 
   parts of the framework, e.g.. Error handling, logging etc...
+
 
 
   //The actual Implementations of bootstrap, under in kernel.php (Illuminate\Foundation\Http)
 1) Executes the bootstrapping process (if not done yet)
 • Checks if the application has already been bootstrapped (hasBeenBootstrapped())
 • If not, it runs all the bootstrappers by calling bootstrapWith() and passing them in
-
 
 → public function bootstrap() {
      if (! $this->app->hasBeenBootstrapped()) {
@@ -230,7 +236,6 @@
 • Just returns the list/array of bootstrapper classes 
   e.g.. LoadEnvironmentVariables, HandleExceptions, RegisterProviders, etc...
 
-
 → protected function bootstrappers(){ 
     return $this->bootstrappers; 
   }
@@ -240,7 +245,6 @@
 3) The actual "bootstrapper classes", that laravel bootstraps 
    in order to prepare the framework
 
-
 → protected $bootstrappers = [
    \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
    \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
@@ -249,6 +253,7 @@
    \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
    \Illuminate\Foundation\Bootstrap\BootProviders::class,
   ];
+
 
 
   ( Deep explanation of each Bootstrapper Classes ):    
@@ -284,4 +289,189 @@
 
 ** ( Understanding {Service Providers} ):
 
-- 
+- One of the keysteps during the "start-up / bootstrapping" 
+  process involves setting up "service providers"
+
+
+- "Service providers" can be perceived as "helpers", that gets 
+  everything ready for your "application" to run properly
+
+  they take care of setting up all the major parts of your application
+  e.g..
+  • database
+  • ques
+  • validation
+  • routing
+  • etc...
+
+
+- Note:
+  
+• In the situation of trying to use services from other 
+  providers in the register method,
+  
+  the register method doesn't guarantee, that all providers 
+  have been loaded yet
+
+  the services you attempt to use, might not be available yet
+
+
+• any code that depends on services from other providers,
+  should be placed in the "Boot method"
+
+  the register method should just be used to registering services,
+  within the container
+
+
+
+  ( Code ):    
+  
+  <?php 
+
+  namespace App\Providers 
+
+  use Illuminate\Support\ServiceProvider;
+
+  class AppServiceProvider extends ServiceProvider 
+  {
+    /**
+     * Register any application services
+     */
+    public function register(): void 
+    {
+      //
+    }
+
+    /**
+     * Bootstrap any application services
+     */
+     public function boot(): void
+     {
+       //
+     }
+  }
+
+
+
+
+** ( Understanding {RegisterProviders} ):
+
+- the "register method", is used to "register / bind", "services / classes"
+  into the "service container"
+
+
+- Back to the "Bootstrappers" under the...
+  "Illuminate\Foundation\Bootstrap\RegisterProviders::class"
+  
+  the method: "public function bootstrap(Application $app){...}"
+  gets called when the application is bootstrapping, 
+  
+  under it, "$app->registerConfiguredProviders();", this method...
+  • uses the, "ProviderRepository" 
+  • then calls the "public function load(array $providers){...}" method
+    on that repository
+  
+  the load method: "public function load(array $providers){...}",
+  essentially...
+  • loads the providers
+  • registers the providers, calling the register method
+    on the application instance 
+
+  the register method, "public function register($provider, $force = false){...}",
+  defined in the "Application.php"...
+  • checks if a "provider" is already "registered / not"
+  • then eventually calls the "register method" on the "service provider"
+
+
+
+
+** ( Understanding {BootProviders} ):
+
+- after all "Service Providers" have been "Registered" they are "booted",
+  • "Register" each "service provider"
+  • Then, "Boot" each "service provider"
+  
+  the "boot method" is the "action method"
+
+  Back to the "Bootstrappers" under the...
+  "Illuminate\Foundation\Bootstrap\BootProviders::class",
+  is what calls the boot method, on the "service provider"
+
+  public function bootstrap(Application $app){ $app->boot(); }
+  //calls the "boot method" from the "application object"
+
+  the boot method: "public function boot(){...}", defined in the "Application.php"...
+  • checks if a "service provider" has already been booted or not 
+  • then, calls the "bootProvider()" method on that "service provider"
+
+  the boot provider method, "protected function bootProvider(ServicePorvider $Provider){...}",
+  defined in the "Application.php", calls the "boot method" on the "provider object"
+
+
+
+
+** ( Understanding {Service Containers} ):
+
+- "Service Container" is the dependency injection container,
+   
+  In the "application.php application class", it extends the "Container",
+  essentially the "application class" is also the "Service Container"
+
+
+
+
+** ( Understanding {"Console Request" Handling Sequence} & {artisan} ):
+
+- {Console Requests} are not "processed" by the "index.php", 
+  instead the {console requests} enter the application,
+  through the "artisan CLI" 
+  
+  which "bootstraps" the "application" using the "console kernel"
+
+  The "Command Syntax" is...
+  • php artisan {namespace}:{commands available to namespace}
+
+
+- "Artisan Commands" are handle by the "Artisan File", within,
+  Laravel's root project directory
+
+  it is a script( just like index.php )...
+  • creates
+  • configures
+  • gets the application instance
+
+  but calls the "handleCommand" method instead of the "handleRequest"
+  ( which is defined in the "Application.php" )
+
+
+- the "handleCommand", creates the console kernel & then calls
+  the "handle();" method, defined from the "kernel object"
+  
+  ( and the process is similar to the "index.php" )
+
+
+
+* ( Samples of Artisan Commands ):   
+
+ • CMD: php artisan list {-h} 
+ // see list of commands, adding {-h flag} gives 
+ // specific instruction about the command 
+
+
+ • CMD: php artisan route:list 
+ // displays list of available routes ( both application & vendor ),
+ // adding → --except-vendor, excludes the vendor routes    
+
+
+ • php artisan list {namespace}
+ // show list of commands available to the namespace,
+ // adding → :{commands available to namespace} -h
+ // gives more info about the specific command 
+  
+
+
+
+** ( Understanding {Kernels} ):
+
+- kernels are the brains of the operation, "directing" how "requests" 
+  are "handled"( albeit, "web request" / "console commands" )
