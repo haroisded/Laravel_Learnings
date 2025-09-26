@@ -1,0 +1,113 @@
+- - - ( Laravel Route Parameters ) - - -
+
+
+- There are some cases, where we would want to 
+  access values passed to the URL, e.g.. 
+  • /transactions/{ID} 
+  • /users/{ID}
+
+  we can do this by using "route parameters"
+  ( can also be used w/the controller )   
+
+
+  ( Sample Code ):    
+
+   Route::get('/transaction/{userID}/{message}', function ($userID, $message) {
+       return "User: {$userID} <br> Message: {$message}";
+   });
+   /* 
+   (URL):
+   http://localhost:8000/transaction/Uel/Goodmorning
+
+   (Output):
+   User: Uel
+   Message: Goodmorning
+
+   The function parameters will take values passed on The URL Parameter, In order
+   */
+
+
+
+- There are also some cases where, we would
+  want a parameter to be "optional"
+
+
+  ( Sample Code ):    
+
+   Route::get('/transaction/{userID}/{message?}', function ($userID, $message = null) {
+       return "User: {$userID} <br> Message: {$message}";
+   });
+      /* 
+   (URL):
+   http://localhost:8000/transaction/Uel
+
+   (Output):
+   User: Uel
+   Message: 
+
+   If a value has been passed on the "Optional Parameter", then that parameter
+   will take the value, IF not, then it would take the assigned default value   
+
+   Note: 
+   For optional parameters, they're required to have 
+   a default value, otherwise, there would be errors 
+   */
+
+
+
+  (Note):
+  
+ - It's best practice to use "Route / Path parameters" 
+   for identifiying a...
+   "specific resource" / "relationship within RESTful APIs"
+
+
+ - besides of setting the parameters, using route parameters,
+   Users can also use "Query String Paramters"
+
+   in some cases, its better to use "Query Strings" instead 
+   of "Route parameters", especially in dealing w/... 
+   • filter  
+   • sorting
+   • pagination
+   • etc...
+   
+   or working with a "resource", e.g..
+   • transaction
+   • file
+   • report ( where you're passing a reportID ) 
+
+   Sample URL: 
+   /report/{reportID}?year={year_num}&month={month_num} 
+
+
+
+
+** ( Dependency Injection, within the Route Actions ):  
+
+- "Routes" may also have "dependencies", Laravel allows 
+  Users to "inject classes" in the "route actions"
+
+  whether "controller / callback", Laravel's 
+  "Service Container" will automatically resolve them 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+  

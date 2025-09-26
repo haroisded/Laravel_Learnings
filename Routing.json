@@ -1,0 +1,177 @@
+- - - ( Laravel Routing ) - - -
+
+** ( Routing ):
+
+- is a process that... 
+  → takes a request 
+  → maps it to an action 
+  → returns a response
+
+  which can be done through a 
+  "console" or "web request"
+
+  the router's job is to connect the request
+  to the corresponding action in the application
+
+
+- {Routes} are stored in the "routes" directory,
+  and defined in different route files, which are...
+  • {console.php}, stores & defines, closure based commands
+  • {web.php}, stores the application's HTTP routes
+
+
+  Note: You can have more route files, e.g.. 
+  
+  • if you are building an "API", then you can create 
+    an "api.php" route file, which contains api related routes
+
+  • you can also "define" your own "route file", that can group
+    certain routes ( to avoid "web.php" getting bigger)
+    e.g.. "admin routes( admin.php ), requests related to the admin"
+    
+ 
+- You can "view all" application routes, using the "artisan cmd"...
+  CMD: {php artisan route:list}
+
+  Note w/"up route" that's part of the list: 
+
+  The "up" route, "called" in the "app.php", it's considered
+  a "vendor route", because it's not defined by the application,
+  rather it's defined "by Laravel"
+
+  The "health-up.blade.php", is the "view" that you see, when the 
+  application is "in maintenance"
+
+ 
+  Other Commands:
+  
+  CMD: {php artisan route:list --except-vendor}
+  //exclude routes not defined by the application 
+  
+
+  CMD: {php artisan route:list --only-vendor}
+  //returns routes defined, outside the application 
+
+
+  CMD: {php artisan route:list --path=*URI}
+  //filtering routes displayed, by providing path options
+
+
+
+
+** ( web.php ):    
+
+- there is a default route defined by laravel 
+  ( which is what you see in localhost )
+
+
+  ( Code Sample: Defined There ): 
+  
+   Route::get('/', function () {
+    return view('welcome');
+   }); 
+  // This code refers & returns the welcome.blade.php file 
+  // under resources/views directory
+
+  
+   ( Code: Defining Your Own ): 
+
+   Route::get('/home', function () {
+    return 'You are in home';
+   });
+
+   Route::get('/aboutus', function () {
+    return 'You are in aboutus';
+   });
+
+   Route::get('/help', function () {
+    return 'You are in help';
+   });
+
+
+
+
+** ( Requests ):  
+
+- Laravel's router allows you to define 
+  different types of HTTP Requests, e.g.. 
+  • GET
+  • POST
+  • PUT
+  • PATCH
+  • DELETE
+  
+
+- There are cases where you want a single 
+  route to handle multiple request types,
+
+  Laravel provides 2 Methods, which is, 
+  "match" & "any", e.g...
+  
+  
+ ( Code: Sample of both "match" & "any" ):  
+
+1) Route::match( ['get', 'post'], '/home', function () {
+    return 'You are in home';
+   });
+   //allows both request methods, defined in the match array,
+   //to trigger the specfic route action, defined on the route
+
+
+2) Route::any( '/home', function () {
+    return 'You are in home';
+   });
+   //allows any request method to trigger the route's action
+
+
+
+- There is another method called "redirect", allows you 
+  to setup a redirect from one route to another, 
+  Redirecting to "/home" → "/dashboard" e.g..    
+
+
+  ( Code: Sample of Redirecting ):   
+
+  Route::redirect('/home', '/dashboard');
+  //this method actually uses the "any" method
+  //allowing any type of request method, to  
+  //trigger the reidrect action
+
+
+
+
+** ( Route Caching ):  
+
+- Laravel has an "artisan CMD" to "cache routes",
+
+  w/this, you are instructing laravel to serialize / compile
+  all of the routes into a single file, 
+  
+  so that it can load routes from the cached instead 
+  of loading every single routes file separately, e.g.. 
+
+  CMD {php artisan route:cache}
+
+
+- The cached routes file, is stored under the,
+  "bootstrap\cache\routes-v7.php", but is present 
+  only when the command has been run
+
+  Note:
+  if a user added new routes or change existing ones,
+  the cache won't update automatically, so the CMD 
+  needs to be run, every time that happens   
+
+
+- You can clear/delete the cache file w/the command... 
+
+  CMD {php artisan route:clear}  
+  
+
+  
+  
+  
+
+    
+
+

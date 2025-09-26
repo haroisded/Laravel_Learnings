@@ -1,0 +1,32 @@
+- - - ( Laravel Configuration ) - - -
+
+- Laravel's configuation files, are stored in the "Config directory",
+  each file in "that" directory corresponds to a specific 
+  part of the application...
+  
+  • app.php
+  • auth.php
+  • cache.php
+  • database.php
+  • filesystems.php
+  • logging.php
+  • mail.php
+  • queue.php
+  • services.php
+  • session.php
+
+- all of these "PHP files", "return arrays" of 
+  key - value pair "configuration options"
+  ( Variables relies on "Environment Variables" )
+
+
+
+  ( app.php ):
+
+- contains the basic configuration for the application, e.g..
+  • name 
+  • app environment
+  • if debug mode's enabled // determines if error should be displayed or not ( bool )
+  • timezone
+  • encryption key
+  • etc...

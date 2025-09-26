@@ -139,7 +139,7 @@
 
 - it contains the... 
   • "web routes" under "web.php"( located in this file )
-  • "console based commands" under "under console.php"( located in this file )
+  • "console based commands" under "console.php"( closure-defined, small commands )
 
   these are just defaults, which users can have different 
   route files, e.g.. 

@@ -422,9 +422,7 @@
 
 ** ( Understanding {"Console Request" Handling Sequence} & {artisan} ):
 
-- {Console Requests} are not "processed" by the "index.php", 
-  instead the {console requests} enter the application,
-  through the "artisan CLI" 
+- {Console Requests} enter the "application", through the "artisan CLI" 
   
   which "bootstraps" the "application" using the "console kernel"
 
@@ -463,10 +461,24 @@
  // adding → --except-vendor, excludes the vendor routes    
 
 
- • php artisan list {namespace}
+ • CMD: php artisan list {namespace}
  // show list of commands available to the namespace,
  // adding → :{commands available to namespace} -h
  // gives more info about the specific command 
+
+
+ • CMD: php artisan tinker
+ /*
+ Opens an interactive CLI (REPL) for running PHP & Laravel Features directly
+
+ (Example):
+ You can run Eloquent queries, test functions, or execute Laravel features
+ Commands like `app()->down()` & `app()->up()` can be used to toggle maintenance mode
+
+ You can also configure Tinker to allow running certain Artisan commands,
+ To do this, publish the Tinker config file and add your custom commands 
+ to the `commands` allow list
+ */
   
 
 
