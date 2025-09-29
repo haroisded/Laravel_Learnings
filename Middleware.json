@@ -172,8 +172,7 @@
   - There is also...
   • "appendToGroup(*Group_Name, [*Middlewares, ..., ...]);"
   • "prependToGroup(*Group_Name, [*Middlewares, ..., ...]);"
-  • "removeFromGroup(*Group_Name, [*Middlewares, ..., ...]);"
-  • "replaceInGroup(*Group_Name, [*Middleware_Search], [*To_Be_Replaced_Middlewares]);"
+  • "removeFromGroup(*Group_Name, [*Middlewares, ..., ...]);"   
 
   that simplifies the process of adding multiple middlewares, by defining 
   it within the withMiddleware(...){..., ...} under "app.php", & using the
@@ -181,11 +180,13 @@
 
   /* 
   Note: In terms of Group, besides from passing the group name 
-        to the middleware() as an argument, in terms of "web(web.php)"
-        ( or other routes file )
-          
-        you can just add the "web" in the group name, & the middelware(s)
-        defined individually or by group in the "app.php", will be applied
+        to the middleware() as an argument, in terms of groups
+        "web" and "api"
+        
+        you can just add the "web" & "api" in the group name, 
+        & the middelware(s) defined individually or by group 
+        in the "app.php" or to be created "api.php", will be 
+        applied ( no need to pass the group name as arguments )
   */ 
 
 
