@@ -1,0 +1,173 @@
+- - - ( Laravel Grouping Routes ) - - -
+
+
+** ( Route Grouping ):   
+
+- Grouping Route URI Prefix...
+  code: {"Route::prefix('URI_prefix')->group(function() {...});"}
+
+- Grouping Route Controllers...
+  code: {"Route::controller('controller_name')->group(function() {...});"}
+
+
+
+* ( Old Routes Code ):    
+
+ Route::get('/transactions', [App\Http\Controllers\Test_Controller::class, 'index']);
+ Route::get('/transactions/{transactionId}', [App\Http\Controllers\Test_Controller::class, 'show']);
+ Route::get('/transactions/create', [App\Http\Controllers\Test_Controller::class, 'create']);
+ Route::post('/transactions', [App\Http\Controllers\Test_Controller::class, 'store']);
+
+
+
+* ( Grouping Routes "URI prefix" ):   
+
+ Route::prefix('transactions')->group(function () {
+
+  Route::get('/', [TransactionController::class, 'index']);
+  Route::get('/create', [TransactionController::class, 'create']);
+  Route::get('/{transactionId}', [TransactionController::class, 'show']);
+  Route::post('/', [TransactionController::class, 'store']);
+ });
+
+
+
+* ( Grouping Routes "Controller" w/"Grouped URI prefix" ):   
+
+ Route::prefix('transactions')->group(function () {
+  Route::controller(TransactionController::class)->group(function () {
+
+    Route::get('/', 'index');
+    Route::get('/create', 'create');
+    Route::get('/{transactionId}', 'show');
+    Route::post('/', 'store');
+   });
+ });
+
+
+
+
+** ( "Route Names" & "route() helper functions" ):   
+
+- "->name('...')" methods, are methods that adds identification
+  to your routes, make it simple to navigate and identify them,
+  using the artisan command "php artisan route:list" 
+
+
+
+* ( ->name(...) method Sample Code ):
+
+ Route::prefix('transactions')->group(function () {
+  Route::controller(TransactionController::class)->group(function () {
+
+    Route::get('/', 'index')->name('transactions.index');
+    Route::get('/create', 'create')->name('transactions.create');
+    Route::post('/store', 'store')->name('transactions.store');
+    Route::get('/transact', 'show')->name('transactions.transact');
+   });
+ });
+ //Note: Route Names MUST! be unique, unless it would cause errors 
+
+
+- to_route( *present_route_name, *present_route_parameter ) helper function,
+  a function that redirects users, to the defined route within the parameter(s) 
+  //Note: It returns a response & it can only be used on "GET" Request Method
+
+
+- route( *present_route_name, *present_route_parameter ) helper function, 
+  is a function that "generates a URI" of a "route", using 
+  the name assigned w/the "->name(...) method"
+  //Note: It only returns a string
+
+
+  ( Sample Code ):  
+   
+  1) echo route('create'); 
+     output: "http://localhost:8000/transactions/create"
+     
+
+  2) echo route('transaction', ['transactionID' => 5]);
+     output: "http://localhost:8000/transactions/5"
+
+  // Example #1 is a Route Method, used, w/o URI parameters
+  // Example #2 is a Route Method, used, w/ URI parameters 
+
+
+
+
+** ( Grouping Routes "Name" ):   
+
+- Grouping Route Name...
+  code: {"Route::name('present_route_name')->group(function() {...});"}
+
+
+* ( Grouping Routes "name" ): 
+
+ Route::prefix('transactions')->group(function () {
+  Route::controller(TransactionController::class)->group(function () {
+   Route::name('transactions.')->group(function() {
+
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/transact', 'show')->name('transact');
+    });
+   });
+ });
+
+
+
+* ( Simplifying Syntax w/"::name()" + "::prefix()" ):   
+
+ Route::prefix('transactions')->name('transactions.')->group(function () {
+  Route::controller(TransactionController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/store', 'store')->name('store');
+    Route::get('/transact', 'show')->name('transact');
+  });
+ });
+
+
+
+
+** ( "Registering" newly created "routes file" ):
+
+- within the "app.php", {"return Application::..."}, the {"->withRouting(...)"}
+  accepts an argument called "then", where Users can pass a "closure" & "register" 
+  additional "route files"
+
+
+ ( Code under "app.php" ):   
+
+  then: function() { 
+   Route::prefix('transactions')
+   ->name('transactions.')
+   ->group(base_path('routes/{Routes_file}'));
+  }
+
+  /* 
+  Note:
+  1)
+  Once adding the Route path, you can remove the...
+
+  "Route::prefix('transactions')->name('transactions.')->group(...)"
+
+  from the route group
+
+
+  
+  2) 
+  In the context of, registering a newly created
+  routes file, w/o groups, the process is still 
+  the same, e.g..
+
+  Route::prefix('transactions')
+  ->name('transactions.')
+  ->group(base_path('routes/transactions.php'));
+
+  you are still required to prefix and add a name,
+  but in this case, its general for all routes 
+  */
+
+

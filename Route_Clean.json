@@ -1,0 +1,141 @@
+- - - ( Laravel Clean Up Routes ) - - -
+
+- "Route Action Functions" are "defined" directly as a closure
+   within the "routes file", but as the function gets bigger, 
+   it can be hard to maintain
+
+  this is where "controllers" comes in, insteead of "defining"
+  all of the logic & request handling into the closures withing
+  the routes file
+
+  Users, can use "controller classes" instead, which can help
+  keeping the "code clean & organized"
+
+
+- we can start by creating a controller, using artisan,
+  CMD: {"php artisan make:controller *Controller_Name"}
+  //Controller files, can be located under app/http/controllers DIR
+  //also, the present controller file, is optional & can be removed
+
+
+  ( Sample Code ):    
+
+  ("Controller File"):  
+
+   <?php
+
+   namespace App\Http\Controllers;
+   use Illuminate\Http\Request
+
+   class Test_Controller{
+    function index():string { return 'Transactions Page'; }
+    function show(int $transactionId):string { return 'Transaction: ' . $transactionId; }
+    function create():string { return 'Form to Create a Transaction'; }
+    function store(Request $request):string { return 'Transaction Created'; }
+   }
+
+
+   
+  ("Routes File"): 
+
+   <?php
+    
+   use App\Http\Controllers\Test_Controller
+   use Illuminate\Support\Facades\Route;
+
+   Route::get('/transactions', [App\Http\Controllers\Test_Controller::class, 'index']);
+   Route::get('/transactions/{transactionId}', [App\Http\Controllers\Test_Controller::class, 'show']);
+   Route::get('/transactions/create', [App\Http\Controllers\Test_Controller::class, 'create']);
+   Route::post('/transactions', [App\Http\Controllers\Test_Controller::class, 'store']);
+
+  /* 
+     (Note): 
+      For Injected Class Dependencies, you can 
+      create a constructor to initialize & use 
+      them directly instead 
+
+
+     (Sample Code):
+      $Request_Dependency;
+
+      public function __construct(Request $request)
+      {
+         $this->Request_Dependency = $request;
+      }
+
+      function store():string { 
+         $name = $this->request->input('name', 'default');
+         return 'Transaction Created'; 
+      }
+  */
+
+
+- "Route Overwriting", is the case where a route process 
+  a value that it should not process, e.g..
+
+  1) Route::get('/transactions/{transactionId}', [App\Http\Controllers\Test_Controller::class, 'show']);
+  2) Route::get('/transactions/create', [App\Http\Controllers\Test_Controller::class, 'create']);
+
+  in this code here, if you typed, "/transactions/create" in the "URL",
+  it might be processed by "Route #1" instead of "Route #2", in this case
+  you can use...
+
+  • "constraints", e.g.. ->whereNumber($param) etc...
+  • or switch the order of the routes, so the previous 
+    "Route #2" will process the value first 
+
+
+- "Single Action Controllers", are standalone controllers 
+  that only has one responsibility
+
+  we can use artisan again, to make this kind of controller
+  CMD: {"php artisan make:controller *Controller_Name --invokable"}
+
+
+  ( Sample Code ):  
+
+   ("Single Action Controller File"):    
+
+   <?php
+
+    namespace App\Http\Controllers;
+    use Illuminate\Http\Request;
+
+
+    class Test_Single_Controller
+    {
+       /**
+       * Handle the incoming request.
+       */
+       public function __invoke(Request $request)
+       {
+         return 'Processed Transaction' . $transactionId;
+       }
+    }
+
+
+
+   ("Routes File"): 
+
+   use App\Http\Controllers\Test_Single_Controller
+   use Illuminate\Support\Facades\Route;
+
+   Route::post(
+    '/transactions/{transactionId}/process', 
+    [App\Http\Controllers\Test_Single_Controller::class]
+   );
+
+
+   /* 
+   Note:
+   when the Single Action Controller file was created, 
+   the Request Dependency Class is also already created 
+
+   also... since in the command you added --invokable,
+   it created a function that immediately invokes its 
+   logic,
+   
+   this is why in the routes, it's no longer needed to
+   require the method of the class that would do the 
+   action ( because there's only a single method )
+   */   

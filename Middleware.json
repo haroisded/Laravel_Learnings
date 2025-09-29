@@ -1,0 +1,252 @@
+- - - ( How Middleware Works Laravel ) - - -
+
+- "Middlewares", are a "series" of "filters / layers"   
+  that "requests" must pass through, before reaching 
+  the "Application"
+
+  where "middleware's" are "registered", can be seen under the "app.php", 
+  {"->withMiddleware( function (Middleware $middleware){...})"}
+
+
+
+
+** ( Understanding {"->withMiddleware( function (Middleware $middleware){...})"} ):  
+
+- the method, can be located under the "ApplicationBuilder.php", used to
+  register the...
+  • "global middleware"
+  • "middleware groups" 
+  • "middleware aliases"  
+  for the application
+
+
+- how it works, in the process of handling middlewares...
+  → middleware object is created
+  → calling the callback(), passing 
+    in the middleware() object
+  → setting the middleware groups 
+  → sets middleware priorities 
+
+
+
+
+** ( Understanding {"getGlobalMiddleware()"} ):
+
+- "Users" can register "middlewares globally",
+
+  every "HTTP requests", going through the "application",
+  will have to go through all of the "global middlewares"
+
+
+- Inside "this" method, it contains the "default middlewares",
+  
+  e.g.. if an "application" is in "maintenance mode", this 
+  is the "middleware stack", responsible for preventing
+  requests from going through
+
+
+
+
+** ( Understanding "prepends" & "appends" properties / methods ):  
+
+- In order to "add", own "custom middleware", 
+  users need to add it either to the...
+  • "prepends list" ( adding middleware to the beginning of the stack )
+  • "appends list" ( adding middleware to the end of the stack )
+  these are "defined" under the "Middleware.php"
+
+
+- These methods("prepend()" / "appends()"), can be used, under the...
+  {"->withMiddleware( function (Middleware $middleware){...})"}
+  to "add" the "custom middleware" → "global middleware stack" 
+
+
+
+
+** ("Middleware Creation" w/"Artisan Commands" &  "Middleware Components"):  
+
+- "Middlewares" in Laravel, needs to "define" the "handle method",
+  which accepts "request" as the argument & "closure"
+  
+  • "request", is the current request
+  
+  • "closure", is to pass the request 
+    to the next middleware or next 
+    layer of application
+    ( to generate response )
+
+
+- To create the "Middleware", we can use this "artisan command"
+
+  CMD: {"php artisan make:middleware *Middleware_Name"}
+  // The Created Middlware, can be located under the 
+  // app/Http/Middleware/ Directory
+
+
+
+* ( The Default Middleware Code Defined ):  
+
+ public function handle(Request $request, Closure $next): Response
+ {
+   // Logic...
+
+   return $next(... $request);
+ }
+
+ /*
+ → it takes the request 
+ → request is handled by logic defined later
+ → passes "request" to the next middleware
+ */
+
+
+
+* ( Sample Middleware Code, Setting "UUID" for both "Request & Response" ):  
+
+ public function handle(Request $request, Closure $next): Response
+ {
+  $request_Id = $request->headers->get('X-Request-Id');
+
+
+  if (!$request_Id) {
+   $request_Id = (string) Str::uuid();
+   $request->headers->set('X-Request-Id', $request_Id);
+  }
+
+  $response = $next($request);
+
+  $response->headers->set('X-Request-Id', $requestId);
+
+
+  return $response;
+ }
+
+ /*
+  Middleware Name: AssignRequestId.php
+
+  → Look for "X-Request-Id" in the incoming request, 
+    If it doesn’t exist → generate a new UUID 
+    & attach it to the request headers
+
+  → Call $next($request) to send the modified 
+    request to the next middleware or controller
+
+  → Once the controller and deeper middleware return 
+    a response, this middleware resumes
+
+  → Attach the same X-Request-Id to the response headers
+
+  → Send the updated response back through 
+    the remaining outward middleware
+ */
+
+
+- Appending "Custom Middleware" to the "Global Middleware Stack"
+
+ ->withMiddleware(function (Middleware $middleware){
+   $middleware->append(AssignRequestId::class);
+ })
+
+
+
+
+** ( Registering Middlwares for Individual & Grouped Routes ):   
+
+ * ( Individual w/Middleware ):
+ {" Route::get(... , function(){...} )->middleware(*present_middleware); "} 
+
+
+ * ( Grouped w/Middleware ): 
+ {" Route::prefix(...)-> middleware(... or  [...,...])-> group( function(){...} ); "}
+
+
+ * ( Individual w/o Middleware ):
+ {" Route::get(... , function(){...} )->withoutMiddleware(*present_middleware); "} 
+
+
+ * ( grouped w/o Middleware ):   
+ {" Route::withoutMiddleware(... or  [...,...])-> group( function(){...} ); "}
+
+
+* ( appendToGroup(...) & prependToGroup(...) ):
+  - There is also...
+  • "appendToGroup(*Group_Name, [*Middlewares, ..., ...]);"
+  • "prependToGroup(*Group_Name, [*Middlewares, ..., ...]);"
+  • "removeFromGroup(*Group_Name, [*Middlewares, ..., ...]);"
+  • "replaceInGroup(*Group_Name, [*Middleware_Search], [*To_Be_Replaced_Middlewares]);"
+
+  that simplifies the process of adding multiple middlewares, by defining 
+  it within the withMiddleware(...){..., ...} under "app.php", & using the
+  assigned "group name" as an argument for "->middleware()" 
+
+  /* 
+  Note: In terms of Group, besides from passing the group name 
+        to the middleware() as an argument, in terms of "web(web.php)"
+        ( or other routes file )
+          
+        you can just add the "web" in the group name, & the middelware(s)
+        defined individually or by group in the "app.php", will be applied
+  */ 
+
+
+
+
+** ( "response()", "throw new NotFoundHttpException()", "abort()" w/404 Response ):   
+
+- return response(status: 404); 
+  //returns a 404 response page, provided by the browser 
+
+- throw new NotFoundHttpException(); & abort(404)
+  //returns a 404 response page, provided by laravel
+ 
+
+
+
+** ( Laravel Default Middleware Groups ):   
+
+- Laravel has Default Middleware Groups, applied
+  to certain routes, "web( web.php )" & "api( not defined by default )"
+  ( which can be seen under {"getMiddlewareGroups(...)"} )
+
+
+- In the case of the "web", "web requests", goes to 
+  the "web middleware stack", in addition to the 
+  "global & custom middlewares"
+  
+
+- Users can...
+  • append & prepend
+  • replace
+  • remove 
+  middlewares to both groups 
+  ("web group" & "api group"), e.g.. 
+
+  
+  ( Under the "app.php" ):  
+  ->withMiddleware( function (Middleware $middleware){
+    $middleware->web(
+     prepend: [*Middleware],  
+     replace: [*Middleware_to_be_replaced => *Middleware],
+     remove:  [*Middleware]
+    )
+  })
+   
+
+
+
+** ( Defining Middleware Aliases ):  
+
+- Users can defined Middlewar Aliases &
+  pass parameters to middlewares, e.g..
+
+  ( Under the "app.php" ):  
+  ->withMiddleware( function (Middleware $middleware){
+    $middleware->alias(
+     [
+      'role' => *Middleware
+     ]
+    )
+  })
+
+
+  

@@ -89,25 +89,77 @@
   Users to "inject classes" in the "route actions"
 
   whether "controller / callback", Laravel's 
-  "Service Container" will automatically resolve them 
+  "Service Container" will automatically "resolve" them 
 
 
+  ( Sample Code: Dealing with "Query Strings" & "Request Dependency" ):  
+  
+    Route::get('/report/{reportID}', function (\Illuminate\Http\Request $request, $reportID) {
+      $year = $request->get('year');   
+      $month = $request->get('month');
 
 
+      return "Generating Report {$reportID} for {$year} and {$month}";
+   });
+      /* 
+   (URL):
+   1) http://localhost:8000/report/reportId?year=2025&month=2
+   2) http://localhost:8000/report/reportId
 
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
+   (Output):
+   1) "Generating Report reportId for 2025 and 2"
+   2) "Generating Report reportId for and"
 
   
+   Note: Its better to put the "Injected Dependencies" 
+         before The "Route Parameters" in the "function"
+         ( especially w/Route Parameters )
+   */
+
+
+
+
+** ( REGEX w/Route Function Parameters ):  
+
+- the only way to strict type to your parameters is 
+  through "constraints" or "REGEX w/Method Chain", e.g..
+  "Route::(...)->where( *query_name, *expression )"
+
+
+* ( Example ):  
+
+  ( Method Chain )
+  Route::(...)
+  ->where( 'reportId' , '[0-9]+' )
+  ->where( 'fileId' , '[0-9]+' )
+
+
+  ( Array Containing REGEX as key value pairs )
+  Route::(...)->where( ['reportId' => '[0-9]+', 'fileId' => '[0-9]+',]);
+
+
+  - Users, can simplify the addition of constraints & also lessen  
+    duplication of the "->where()" method, by adding the constraints 
+    in the "boot function" of the "AppServiceProvider.php"
+  
+
+  ( Example ):    
+
+  public function boot(): void
+  {
+   Route::pattern( 'reportId' , '[0-9]+' );
+   Route::pattern( 'fileId' , '[0-9]+' );
+  }
+  //Then w/this, you no longer need to do "Method Chain" & "REGEX Array" 
+
+
+- Laravel also provides multiple, "where->(...);" method constraints, e.g..
+  • ->whereNumber($param) // Integers only ([0-9]+)
+  • ->whereAlpha($param)  // Only alphabetic ([a-zA-Z]+)
+  • ->whereAlphaNumeric($param) //Only alphanumeric ([a-zA-Z0-9]+
+  • etc...
+
+
+- For file types, you can create another script
+  containing PHP ENUMS & pass the File path in 
+  the Route parameter & get its value
