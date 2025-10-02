@@ -1,95 +1,223 @@
-- - - ( Service Container ) - - -
-
-- Laravel service container a tool that... 
-  • manages class dependencies 
-  • performs dependency injection
+** ( Understanding the Laravel Service Container ):
 
 
-- Dependency injection simply means,
-  
-  "class dependencies" are "injected" to the class by...
-  • constructor
-  • setter methods 
+* ( What is a Service Container? ):
+
+- the Laravel Service Container is an Inversion of Control (IoC) 
+  or Dependency Injection (DI) Container
+
+- It's a powerful tool for managing class dependencies 
+  and performing dependency injection
+
+  Dependencies Injected to the method, setter or constructor, 
+  are automatically resolved & injected by the framework
 
 
-( Sample Code ):   
-
-<?php
-
-namespace App\Http\Controllers;
-
-use App\Services\AppleMusic;
-use Illuminate\View\View;
 
 
-class PodcastController extends Controller {
+* ( Zero Configuration Resolution ):
+
+- Laravel's container has a powerful feature called "auto-wiring", 
+  For concrete classes, you don't need to configure anything.
+
+  When Laravel needs to instantiate a concrete class, it uses 
+  PHP's Reflection API to inspect the constructor parameters. 
+ 
+  If it finds a type-hinted concrete class, it automatically resolves 
+  (instantiates) it. This process is recursive, meaning it will also 
+  resolve all the dependencies of the dependencies.
+
+
+- ( How it works ):
+• Laravel sees TransactionController needs a TransactionService.
+• It uses reflection to see that TransactionService is a concrete class.
+• It instantiates TransactionService and passes it to the controller.
+
+
+
+
+* ( Bindings ):  
+
+- "Auto-wiring" only works for "concrete classes". If you type-hint 
+  an "non-concrete classses", Laravel doesn't know which "concrete",
+  "implementation" to use
+
+
+- Because of this, you would need to tell the "Laravel container", 
+  how to resolve an interface by defining a binding in a Service Provider. 
+
+  since the Laravel Container, can only "autowire" concrete classes,
+  we must "bind", "interface or abstract classes", w/ a "concrete class"
+
+  but before "binding", Users must first "extend / implement" the 
+  "interface or abstract classes" to the "concrete class"
+  ( which we'll "bind" these "non-conrete classes" to )
+
+  after the "extend / implement", then we can now, 
+  bind it to the "concrete class"
+  ( A common place is the "App\Providers\AppServiceProvider" )
+
+
+
+  ( Define the binding in AppServiceProvider.php ):  
+
+  • {" Method 1: Defining and Using the `bindings` property "}
+
+  public $bindings = [
+      *interface/abstract::class => concrete::class,
+  ];
+
+
+
+  • {" Method 2: `bind` method under the `register` method "}
+
+  // Under the AppServiceProvider.php, register()
+  $this->app->bind(*interface/abstract::class, *concrete::class);
+
+
+
+  • {" Method 3: passing a closure ( that would return a concrete class ) "}
+
+  // Under the AppServiceProvider.php, register()
+   $this->app->bind(
+   *interface/abstract::class, 
+   function(){ return new *concrete_class(); }
+   );
+
+  /* 
+  Note: 
+  In this method, if there was a constructor
+  we can pass a value on the parameter of 
+  the class, 
+
+  e.g.. *concrete_class($app); passing an app 
+  as the argument 
+  */
+
+
+
+  • {" Method 4: Resolving dependencies of the returned, concrete class "}
+   
+  // Under the Returned *concrete_class 
+  public class *concrete_class implements *interface_class{
+
+    public function __construct( private *Class_dependency $Parameter )
+    { ... }
+  }
+
+
+  // Under the AppServiceProvider.php, register()
+  $this->app->bind(
+    *interface/abstract::class, 
+    function(){ return new *concrete_class( new *Class_dependency ); }
+  );
+
+  /*
+  Note: 
+  The reason why we must resolve the dependencies of other classes...
+
+  • Normally, the container autowires dependencies automatically 
+
+  • But Inside a closure, Laravel does not autowire by default. 
+    You must explicitly tell it how to construct the class, 
+    including any dependencies.
+  */
+
+
+
+  • {" Method 5: Resolving dependencies of Passed Dependencies "}
+
+  - In this case, the resolved class dependency might also 
+    have its own dependencies
+
+
+  - To handle this, you should resolve those nested dependencies 
+    through the container, so they can also be "automatically constructed"
+
+    We can do this by passing the "$app instance"(Service Container)
+    in the closure
+
+
+    // Under the AppServiceProvider.php, register()
+    $this->app->bind(
+      *interface/abstract::class, 
+      function("$app"){ 
+        
+      return new *concrete_class( $app->make(*class_dependency::class) ); 
+      }
+    );
+
+
+  - in this case, if the "*class_dependency", has other 
+    class dependencies it would be resolved immediately 
     
-    // Create a new controller instance ( Inject Service ). 
-    public function __construct(
-        protected AppleMusic $apple,
-    ) {}
+
+
+  • {" Method 6: Applying Method 5 to the Concrete Class itself "}
+
+  - In this case, the method that we used in method 5, 
+    to automatically resolve the class dependencies of 
+    the dependency we plan to instantiate
+
+    we can also do it w/the concrete_class, to 
+    automatically resolve...
+
+    • dependencies of the concrete class
+
+    • dependencies of those dependencies 
+      (nested dependencies), & so on
+
+
+    // Under the AppServiceProvider.php, register()
+    $this->app->bind(
+      *interface/abstract::class, 
+      function("$app"){ return $app->make(*concrete_class::class); }
+    );
 
     
-    // Show information about the given podcast 
-    // ( Dummy Implementation of the Applemusic Service, use to retrieve podcasts )
-    public function show(string $id): View
-    {
-        return view(
-        'podcasts.show', ['podcast' => $this->apple->findPodcast($id)]
-        );
+
+  • {" Method 7: Method 6, but w/Multiple Constructor values "}
+
+    - In the case of a concrete_class, having a 
+    constructor accepting multiple values 
+
+    Users can include, an "array parameter" in the 
+    "make method" ( which is an assoc_array ), to 
+    fulfill those values in the constructor
+
+    
+    // Under the Concrete Class
+    class *concrete_class {
+        public function __construct(
+          Logger $logger, // <-- Dependency Class "autowired"      
+          string $currency,     
+          int $retryAttempts    
+        ) {
+          $this->logger = $logger;
+          $this->currency = $currency;
+          $this->retryAttempts = $retryAttempts;
+        }
     }
 
-}
 
-
-- in this example...
-
-• PodcastController needs to retrieve podcasts from Apple Music
-
-• we will inject a service that is able to retrieve podcasts
-
-• Since service is injected, we are able to easily "mock", or create 
-  a dummy implementation of the AppleMusic service
-
-
-
-** ( Zero Configuration Resolution ):
-
-- If a class has...  
-• no dependencies 
-• only depends on other "concrete classes" (not interfaces)
-  "container" does not need to be instructed on how to "resolve" that "class"
-
-
-( Sample Code ):    
-
-<?php
-
-class Service
-{
-    // ...
-}
-
-Route::get('/', function (Service $service) {
-    dd($service::class);
-});
-
-
-- in this example...
-• hitting your application's "/" route will automatically resolve 
-  the "Service class" and "inject" it into your route's handler
-
-
-- many of the "classes" you will be "writing" when building Laravel applications 
-  "automatically receive" their "dependencies" via "container", including...
-  • controllers
-  • event listeners
-  • middleware 
-  • more... 
-
-
-- you may "type-hint" dependencies in the "handle method" of "queued jobs"
+    // Under the AppServiceProvider.php, register()
+    $this->app->bind(
+      *interface/abstract::class, 
+      function("$app"){ 
+        return $app->make(StripePaymentGateway::class, [
+        'currency' => 'USD',
+        'retryAttempts' => 3, 
+       ];
+      }
+    );
+    // Note: The Key name must be the same as in the 
+    //       constructor ( The Order doesn't matter )
 
 
 
-** ( When to Utilize the Container ):   
+
+* ( App Facade, App make(), Singleton & Container ):
+
+
+
+
