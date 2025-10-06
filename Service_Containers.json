@@ -216,7 +216,31 @@
 
 
 
-* ( App Facade, App make(), Singleton & Container ):
+* ( App make(), App Facade, Resolve Helper Function & Container method ):
+
+- There are other ways to get dependencies, besides injecting 
+  them via constructor, setters & methods
+  
+  
+  1) {"App ->make() method"} 
+  $dependency = app()->make(*registered_dependency::class, []);  
+    
+  
+  2) {"App::make facade"} 
+  $dependency = App::make(*registered_dependency::class, []);
+    
+  
+  3) {"Resolve Helper Function"} 
+  $dependency = resolve(*registered_dependency::class, []);
+
+      
+  4) {"Injecting Container Instance to inject dependencies"}
+  
+  // Injected the Container Class, via Constructor
+  __construct( private Illuminate\Contracts\Container $container){}
+
+  // Injected anywhere else, via the container method
+  $dependency = this->container->make(*registered_dependency::class, []);  
 
 
 

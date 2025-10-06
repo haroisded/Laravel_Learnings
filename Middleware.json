@@ -41,7 +41,7 @@
 - Inside "this" method, it contains the "default middlewares",
   
   e.g.. if an "application" is in "maintenance mode", this 
-  is the "middleware stack", responsible for preventing
+  is the "middleware stack" responsible for preventing
   requests from going through
 
 
@@ -96,7 +96,7 @@
  /*
  → it takes the request 
  → request is handled by logic defined later
- → passes "request" to the next middleware
+ → passes "request" to the next middleware ( closure )
  */
 
 
@@ -237,7 +237,7 @@
 
 ** ( Defining Middleware Aliases ):  
 
-- Users can defined Middlewar Aliases &
+- Users can defined Middleware Aliases &
   pass parameters to middlewares, e.g..
 
   ( Under the "app.php" ):  

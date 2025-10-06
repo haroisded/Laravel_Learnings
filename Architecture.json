@@ -87,30 +87,6 @@
      ->withExceptions(function (Exceptions $exceptions): void {
          //
      })->create();
-
-
-
-
-** ( Understanding {Handle Request Method}):  
-
-- handle request method purpose...   
-• After running through the "application logic"
-• It's Responsible for taking incoming "HTTP Requests" 
-• then Converting "Requests" -> "Response"
-
-
-- The "handleRequest(Request::capture());" under,
-  "application.php", handles the "request" using 
-  "HTTP Kernel", code...
-
-  the "method" that "handles requests", is 
-  "originally" from the "kernel"
-
-  but by using the "contract(Interface)", 
-  we're able to use it in the "application.php"
-
-  The actual "implementation" is the "kernel" from "HTTP Dir",
-  or "Illuminate\Foundation\Http\Kernel.php"
  
 
 
@@ -139,7 +115,7 @@
    */  
    → $response = $kernel->handle($request)->send();
 
-   // The Implementation in "kernel.php (Illuminate\Foundation\Http)"
+   // The Implementation in "kernel.php(Illuminate\Foundation\Http)"
    → public function handle($request){...}
 
 
@@ -218,41 +194,40 @@
   parts of the framework, e.g.. Error handling, logging etc...
 
 
+//The actual Implementations of bootstrap, under in kernel.php (Illuminate\Foundation\Http)
+  1) Executes the bootstrapping process (if not done yet)
+  • Checks if the application has already been bootstrapped (hasBeenBootstrapped())
+  • If not, it runs all the bootstrappers by calling bootstrapWith() and passing them in
 
-  //The actual Implementations of bootstrap, under in kernel.php (Illuminate\Foundation\Http)
-1) Executes the bootstrapping process (if not done yet)
-• Checks if the application has already been bootstrapped (hasBeenBootstrapped())
-• If not, it runs all the bootstrappers by calling bootstrapWith() and passing them in
-
-→ public function bootstrap() {
-     if (! $this->app->hasBeenBootstrapped()) {
-     $this->app->bootstrapWith($this->bootstrappers());
+  → public function bootstrap() {
+      if (! $this->app->hasBeenBootstrapped()) {
+      $this->app->bootstrapWith($this->bootstrappers());
+      }
     }
-   }
 
 
 
-2) Provides the list of classes that will be "bootstrapped"
-• Just returns the list/array of bootstrapper classes 
-  e.g.. LoadEnvironmentVariables, HandleExceptions, RegisterProviders, etc...
+  2) Provides the list of classes that will be "bootstrapped"
+  • Just returns the list/array of bootstrapper classes 
+    e.g.. LoadEnvironmentVariables, HandleExceptions, RegisterProviders, etc...
 
-→ protected function bootstrappers(){ 
-    return $this->bootstrappers; 
-  }
+  → protected function bootstrappers(){ 
+      return $this->bootstrappers; 
+    }
 
 
 
-3) The actual "bootstrapper classes", that laravel bootstraps 
-   in order to prepare the framework
+  3) The actual "bootstrapper classes", that laravel bootstraps 
+    in order to prepare the framework
 
-→ protected $bootstrappers = [
-   \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
-   \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
-   \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
-   \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-   \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
-   \Illuminate\Foundation\Bootstrap\BootProviders::class,
-  ];
+  → protected $bootstrappers = [
+    \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
+    \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+    \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+    \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+    \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+    \Illuminate\Foundation\Bootstrap\BootProviders::class,
+    ];
 
 
 
