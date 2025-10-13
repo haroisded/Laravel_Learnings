@@ -1,0 +1,29 @@
+- - - ( Laravel Helpers ) - - -
+
+- These are built-in global functions that make common tasks easier,
+  you can use them anywhere in your app without importing anything
+
+- Laravel includes built-in helpers to:
+• Simplify everyday operations (like array, string, and URL handling)
+• Reduce boilerplate code
+• Keep your logic consistent across the app
+• Improve readability and maintainability
+
+
+
+** ( Sample list of Helpers ):  
+
+• config('app.name')	Get values from config files.
+• env('APP_ENV')	Get environment variables.
+• route('route.name', ['id' => 1])	Generate URL to a named route.
+• asset('css/app.css')	Get public asset URL (CSS, JS, images).
+• url('path')	Get full URL for a given path.
+• view('welcome', $data)	Return or render a Blade view.
+• redirect('path')	Redirect to a URL or route.
+• now()	Get current date/time (Carbon instance).
+• e($value)	Escape HTML for safe output.
+
+
+
+** ( Full list of Helpers ): 
+• https://laravel.com/docs/12.x/helpers#

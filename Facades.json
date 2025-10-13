@@ -1,0 +1,23 @@
+- - - ( PHP Facades ) - - -
+
+
+** ( Differentiating Facades Design Pattern & Laravel Facades ):
+
+
+* ( Facades Desgin Pattern ):
+
+- Provides "simplified interface" to a set of 
+  "complex classes / code" 
+
+  The "goal", is to make a "subsytem" easier to use,
+  by providing a "unified high level interface"
+
+
+
+* ( Laravel Facades ):
+
+- Provides a way to "access", "methods" of "classes",
+  from the "service container" in a "static way"
+
+  facades serves as static proxies, proxying status
+  codes to the actual class methods 
