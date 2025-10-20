@@ -96,13 +96,19 @@
 
 - CMD: {php artisan schema:dump}
   This command...
-  • Laravel write's a "schema" file to your application's database/schema directory
+  • Laravel write's a "schema" file to your application's {"database/schema"} directory
   • schema file's name will correspond to the database connection
   • when no other migrations have been executed,
     Laravel executes "schema file", then
     executes remaining migrations ( not part of "schema dump" )
 
-  //Note: You can add a "--prune" flag, to Delete all migration files ( old & new ) 
+  // Flags: 
+  // • "--prune" flag, to Delete all migration files ( old & new ) 
+  // • "--database=connection_name", dump and create  
+  //   it to a new schema file instead of overwriting 
+
+  // Note: to use the new schema file, you must match the
+  //       connection name in the ".env", to the new schema file
 
 
   
