@@ -1,0 +1,83 @@
+- - - ( Get Sharp w/Laravel Blade ) - - -
+
+** ( Return View Methods ):  
+
+1) return view( "view file or filepath", ['data' => 'to be passed'] ); 
+
+
+2) Route::view('/uri', "view file or filepath", ['data' => 'to be passed']);
+
+
+
+** ( Different types of Outputs ):
+
+• <?= $name ?> 
+// Outputs: Gio, PHP syntax  
+
+• @php echo $name @endphp
+// Outputs: Gio, Using PHP blade directive 
+// or echo e($name), to show in plain text 
+// rather than HTML or Script code ( Escapes HTML )
+
+• {{ $name }} 
+// Outputs: Gio, Laravel blade syntax
+// ( Escapes HTML )
+
+• {!! $name !!} 
+// Renders whatever is inside as HTML ( but still references value )
+// w/PHP syntax, Outputs: Gio
+
+• {{-- name --}}
+// Blade Comments ( the safe way to comment w/Laravel )
+
+
+
+** ( Blade Directives ):
+
+- these are "short code snippets" that you can use directly 
+  in your "views", without needing to use PHP tags to code 
+  ( conditionals, loops, etc.. )
+  /* 
+  Some Samples are in Images
+
+  Note: 
+  The difference between @for_each & @for_else,
+  is that @for_else has access to the @empty,
+  which's invoked if the variable is "empty"
+  */
+
+
+
+* ( "@include" directives ):
+
+- The "@include" directive, allows us to include External views → Current view
+
+  we can do this w/the, "@include('view file or filepath', ['data' => 'to be passed']);"
+  //Note: Any Data passed to the parent view, can be used to the included view
+
+
+ ( Other "@include" directives ):
+
+• @includeIf("view file or filepath", ['data' => 'to be passed'])
+// Includes the view, only if it exists, otherwise it does nothing ( no error )
+
+
+• @includeWhen($condition, "view file or filepath", ['data' => 'to be passed'])
+// Includes the view only when a condition is true.
+
+
+• @includeUnless($condition, "view file or filepath", ['name' => 'Geo'])
+// The opposite of @includeWhen — includes the view unless a condition is true
+// e.g.. If $condition were true, the "view file or filepath" wouldn’t be included
+
+
+
+* ( "@inject" directive ):
+
+- @inject lets you pull a class instance (service) right into your Blade file, 
+  without needing to pass it from your controller
+
+
+- "@inject('Varname', 'Full\Namespace\Of\Class')"
+// 1st Argument ('Varname') = what you’ll call it in your Blade file ( e.g.. $varname->method(); )
+// 2nd Argument ('ClassName') = the fully qualified class you want to inject

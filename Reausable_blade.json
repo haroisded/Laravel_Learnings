@@ -1,0 +1,114 @@
+- - - ( Reusable Blade ) - - -
+
+** ( Template Inheritance ):  
+
+- allows templates to become dynamic or be changed,
+  by the template that is inheriting it 
+
+  this can be done w/code: {@extends('template_name');}
+
+
+
+
+** ( "@yield('...')" & "section('...') @endsection" ):
+
+- "@yield('...')", a directive used to make a section dynamic
+
+- "section('...') @endsection", a directive used to add / change 
+  the values under the "@yield('...')"
+
+
+  ( Example Code ):
+
+   {home.blade.php}:   
+
+   @extends("this_layout")
+   
+   @section("title") Home @endsection  or  @section( "title" , "Home" ) //for small one liners
+   @section("content") Contents of Home @endsection 
+
+
+
+   {this_layout.blade.php}:  
+
+   <main> 
+    <h1> @yield("title"); </h1> //replaced by "Home" 
+    <p> @yield("content"); </p> //replaced by "Contents of Home" 
+   </main>
+   //Values are replaced by the home.blade.php
+
+
+
+
+** ( "@section('...') - @show" ):
+
+- this directive allows an entire section of 
+  a template, to become a "yield"
+
+
+ ( Example Code ):
+
+  {home.blade.php}:   
+
+  @extends("this_layout")
+  
+  @section("main")
+   <div> 
+    <h3> Default Title </h3> 
+    <b> Default Paragraph </b> 
+   </div>
+  @endsection
+
+
+
+  {this_layout.blade.php}:  
+
+  @section("main")
+   <main> 
+    <h1> Default Title </h1> 
+    <p> Default Paragraph </p> 
+   </main>
+  @show 
+  //Everything in this @section('main') - @show 
+  //will be replcaed by the one in the home.blade.php
+
+
+
+
+** ( "@parent" ):   
+
+- this directive, is used inside a "@section(...) - @endsection", to
+  add the content from a "parent layout's section", before applying 
+  the change
+
+
+  ( Example Code ):  
+
+  {home.blade.php}:   
+
+   @extends("this_layout")
+    
+    @section("main")
+     @parent //( Main Icon(s) 1 - 3, is added here )
+     Additional Icon (1)
+     Additional Icon (2)
+     Additional Icon (3) 
+    @endsection
+
+
+
+  {this_layout.blade.php}:  
+
+   @section("main")
+    Main Icon (1)
+    Main Icon (2)
+    Main Icon (3)
+   @show 
+   //Everything in this @section('main') - @show 
+   //will be replcaed by the one in the home.blade.php
+
+
+
+  
+
+

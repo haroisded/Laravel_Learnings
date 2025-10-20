@@ -1,0 +1,157 @@
+- - - ( Laravel Database and Migrations ):
+
+
+** ( What are Migrations? ):
+
+- "Migrations" is a "feature" that allows Users 
+  to "define" & "evolve" users "DB Schema" overtime,
+  in a "structured" & "version controlled manner"
+
+
+ - by default the application's database configuration
+   is stored in the database.php file, under "config/database.php"
+
+   database configuration files references the "environment variables"
+
+
+  ( Sample configurations in "config/database.php" ):
+
+  'mysql' => [
+    'read' => [
+        'host' => [
+            env('DB_READ_HOST_1'),
+            env('DB_READ_HOST_2')
+        ],
+    ],
+
+    'write' => [
+        'host' => [env('DB_HOST')],
+    ],
+  ],
+
+  - in this case, you can configure the sql DB, by allowing 
+    to disitrbute server handling databses 
+    • Read Queries ( e.g.. Basic Retirieval )
+    • Write Queries ( e.g.. Insert, Update, Delete, etc... )
+
+
+    
+
+** ( "database/migrations" ):
+
+- Contains migration files which looks like this,
+  "*timestamp_*action_*name_table.php", 
+
+  in which they can be created w/this command...
+  CMD: { php artisan make:migration *action_*name_table }
+
+
+- this files, contain anonymous classes which extends
+  the "migration based" class & Define 2 Methods "UP" & "DOWN" 
+  
+  • "UP", the method invoked, when the migrations are run, 
+    defines changes needed to "add" or "modify" tables, 
+    columns or indexes 
+
+
+  • "DOWN", the method invoked, when "rolling back" / "reverting migrations",
+    defines how to rever the changes 
+    
+    
+
+  ( Sample Code under "UP method" ):
+
+  Schema::create('users', function (Blueprint $table) {
+      $table->id();
+      $table->string('name');
+      $table->string('email')->unique();
+      $table->timestamp('email_verified_at')->nullable();
+      $table->string('password');
+      $table->rememberToken();
+      $table->timestamps();
+  }); 
+
+  • Schema::create //Schema builder, to create tables & columns
+    ( it takes in 2 Arguments )
+  
+  • ('users', //Argument #1: Name of the Table
+
+  • ,function (Blueprint $table) //Argument #2: gets the blueprint instance
+    
+  // Note: the blueprint instasnce is used to "define" and "modify" tables
+
+
+
+
+** ( Squashing Migrations ):   
+
+- As you build your application, you may accumulate more and more migrations over time. 
+  This can lead to your database/migrations directory becoming bloated with potentially 
+  hundreds of migrations. 
+  
+  If you would like, you may "squash" your migrations into a single SQL file
+
+
+* ( Commands ):  
+
+- CMD: {php artisan schema:dump}
+  This command...
+  • Laravel write's a "schema" file to your application's database/schema directory
+  • schema file's name will correspond to the database connection
+  • when no other migrations have been executed,
+    Laravel executes "schema file", then
+    executes remaining migrations ( not part of "schema dump" )
+
+  //Note: You can add a "--prune" flag, to Delete all migration files ( old & new ) 
+
+
+  
+
+** ( Migration Commands ):    
+
+- CMD: {php artisan migrate}
+  // To invoke the "UP" method ( migration & schema file )
+  // ( the opposite is Rollback, which Invokes "DOWN" method )
+
+  // flag: --pretend 
+  // see SQL statements that will be executed,
+  // by the migrations without actually running
+
+  //Note: Laravel keeps track of migrations in  
+  //      "batches", each time this CMD is "run"
+
+
+- CMD: {php artisan migrate:reset}
+  // roll back all of the application's migrations:
+
+
+- CMD: {php artisan migrate:rollback}
+  // rolls back the last "batch" of migrations
+
+
+- CMD: {php artisan migrate:status}
+  // see which migrations have run thus far
+
+
+- CMD: {php artisan migrate:fresh}
+  // drops all tables, then executes the migrate command
+  
+  // flag: --seed
+  // after reset, refills it with "test / default data"
+
+
+- CMD: {php artisan migrate:refresh}
+  // The migrate:refresh command will roll back all of your 
+  // migrations & then execute the migrate command
+
+
+* ( Rollback commands ):   
+- https://laravel.com/docs/12.x/migrations#rolling-back-migrations
+
+
+
+
+** ( Documentation Link for More Schema & Blueprint Methods ):  
+- https://laravel.com/docs/12.x/migrations#tables
+- https://laravel.com/docs/12.x/migrations#columns
+- https://laravel.com/docs/12.x/migrations#indexes
