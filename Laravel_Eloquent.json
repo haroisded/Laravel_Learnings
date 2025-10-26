@@ -1,21 +1,5 @@
 - - - ( Laravel Eloquent ) - - -
 
-** ( Understanding Active Record ):  
-
-- {"Active Record"}, is an approach to accessing data in database  
-→ "Database table / view" is wrapped into a class
-→ "Object Instance" is tied to a "single row" in the table
-→ After creation of an object, a "new row" is added to the table upon save  
-→ "Object loaded", gets info from the database
-→ When "Object" is "updated", "corresponding row" in the "Table" is also "updated"
-→ "Wrapper Class", implements access methods / properties for each column
-  in the "table / view"
-
- tldr: its a design, where each model object directly 
-       represents & manipulates its database record
-
-
-
 
 ** ( Understanding Eloquent ): 
 
@@ -53,8 +37,22 @@
 
   2) {"protected $table = 'flight';"}, under the "model class", you may 
      defined a "table property", w/the "Table name" as its value  
-  
 
+
+
+
+** ( What You Should Do w/Eloquent Models ):
+
+| Task                        | What You Do                                      | Purpose                                |
+| --------------------------- | ------------------------------------------------ | -------------------------------------- |
+| 🏗️ **Define Models**       | Create a model per table                         | Represent database tables in PHP       |
+| ⚙️ **Configure Mapping**    | `$table`, `$fillable`, `$primaryKey`, etc.       | Control how Eloquent interacts with DB |
+| 💾 **Perform CRUD**         | Use `create()`, `find()`, `update()`, `delete()` | Manipulate data without SQL            |
+| 🔗 **Define Relationships** | `hasMany()`, `belongsTo()`, etc.                 | Link models together                   |
+| 🧠 **Add Logic**            | Add helper methods or computed fields            | Keep logic close to the data           |
+| 🔍 **Query**                | Use `where()`, `get()`, `orderBy()`, etc.        | Fetch data cleanly                     |
+
+  
 
 
 ** ( Eloquent Configurations ):    
@@ -103,7 +101,7 @@
 
 
 
-** ( Reitrieving Models ):\
+** ( Retrieving Models ):
 
 - Once model and its associated database table, has been created,
   you can now retrieve data from the database... 
@@ -135,21 +133,3 @@
 
   you can visit the Docs below, for more info... 
   https://laravel.com/docs/12.x/eloquent-relationships
-
-
-   
-
-    
-
-
-
-
-
-
-
-
-
-
-  
-
-

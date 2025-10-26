@@ -1,0 +1,117 @@
+- - - ( Database Concepts ) - - -
+
+** ( DBAL / DataBase Abstraction Layer ):    
+
+- {"DBAL / DataBase Abstraction Layer"}, an interface that allows users
+  to work w/different database implementations ("MySQL", "SQLite" etc.. )
+
+  database abstraction, means hiding away details on how to...
+  • Build Quries
+  • which DB Implementation to use
+  • connect to various DBs
+  • etc.. 
+
+  
+- "PDO" is quite similar to "DBAL", except, it's just 
+  a "Data Access Layer", not a "Database Abstraction"
+
+
+
+
+** ( Data Mapper ):
+
+- {"Data Mapper"} data transfer between "persistence" & "domain layer"
+
+
+- a layer that simplifies "data transfer", between "in - memory objects"
+  and the "persistent storage ( like database )"
+
+  which allows the "persistence layer", to be "decoupled & isolated",
+  from the "domain" or the "business layer"( model ), e.g.. "doctrine ORM"
+  
+  in Doctrine ORM, the mapping can be done via... 
+  • attributes
+  • annotations
+  • configuration files
+  • custom PHP Mappers
+ 
+  
+- "Entities" represent the "table's structure" & 
+  a "single row of data" in that table
+  
+  "attributes" & "annotations", are "metadata" that's added 
+  to the "Entities" to create "mappings" 
+
+
+
+
+** ( Object Relation Mapper ):   
+
+- {"ORM / Object Relation Mapper"}, it is a way of working 
+   w/databases w/o "querying" it directly, e.g..
+
+  {App Code} ⇄ {"ORM"} ⇄ {Database}  
+
+  • converts tables in the "Database", into 
+    "Objects", that can be used in the code
+    
+  • simplifies the "query process", by using "functions" 
+    & "methods" provided by the {"Object Relation Mapper"}
+
+
+
+
+** ( Entity Manager ):  
+
+- {"Entity Manager"}, it's a "Main Access" point to an "ORM / Interface / API",
+   which allows to "manage entities" in "different states", each of these 
+   "entities" have "states", which are...
+   
+  • {New State}: // $user = new User(); → not persisted yet.
+  The entity is newly created in memory & not yet saved in the database
+  
+  • {Managed State} // $entityManager->persist($user);
+  The entity is being tracked by the EntityManager — any changes will be 
+  automatically saved when you call flush()
+
+  • {Detached State} // After $entityManager->detach($user);
+  A detached entity is a database object that exists in memory but is 
+  no longer being tracked or synchronized by Doctrine's EntityManager
+  ( Example of Objects in-memory, "New & Managed State" )
+
+  • {Removed State}: // $entityManager->remove($user);
+  The entity is scheduled for deletion & detached from the database 
+  when flush() is called
+
+
+
+
+** ( Unit of Work ):  
+
+- {"Unit of Work"}, is responsible for keeping "track of changes", it 
+  handles the "entity states" in which "order" things need to "execute"
+  
+  e.g.. it cues the operation to be executed, whenever the 
+  "persist(); / remove(); / flush(); / clear(); / detach();" method is called 
+
+
+  ( Note ):
+  the more "created Entities"(single row of inserted/created data), 
+  the "bigger" the "Unit of Work" gets & the "heavier" the "execution" 
+  becomes..
+  
+  
+
+
+** ( Understanding Active Record ):  
+
+- {"Active Record"}, is an approach to accessing data in database  
+  → "Database table / view" is wrapped into a "class"
+  → "Object Instance" is tied to a "single row" in the table
+  → After "object creation", a "new row" is "added" to the "table" upon "save"
+  → "Object loaded", gets info from the database
+  → When "Object" is "updated", "corresponding row" in the "Table" is also "updated"
+  → "Wrapper Class", implements access methods / properties for each column
+    in the "table / view"
+
+ tldr: its a design, where each model object directly represents & manipulates its database record

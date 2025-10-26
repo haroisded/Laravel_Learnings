@@ -1,0 +1,167 @@
+- - - ( Eloquent Methods & Functions Used in Laravel ) - - -
+
+
+
+## 🏗️ 1. Model Lifecycle & Basic Operations
+
+| Method                                                | Description                                             |
+| ----------------------------------------------------- | ------------------------------------------------------- |
+| `save()`                                              | Insert or update the current model in the database.     |
+| `create(array $attributes)`                           | Create and save a new model instance (mass assignment). |
+| `update(array $attributes = [], array $options = [])` | Update the model's attributes and save.                 |
+| `delete()`                                            | Delete the current model from the database.             |
+| `destroy($ids)`                                       | Delete models by their primary key.                     |
+| `fresh()`                                             | Reload the model from the database.                     |
+| `refresh()`                                           | Reload the model and its relationships.                 |
+| `replicate()`                                         | Clone a model instance without saving.                  |
+| `touch()`                                             | Update the `updated_at` timestamp.                      |
+| `increment($column, $amount = 1, array $extra = [])`  | Increment a numeric column's value.                     |
+| `decrement($column, $amount = 1, array $extra = [])`  | Decrement a numeric column's value.                     |
+
+
+
+## 🔍 2. Retrieval Methods (Static or Builder-based)
+
+| Method                                                              | Description                                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------ |
+| `all()`                                                             | Get all models of a type.                              |
+| `find($id)`                                                         | Find a record by primary key.                          |
+| `findOrFail($id)`                                                   | Find or throw a `ModelNotFoundException`.              |
+| `first()`                                                           | Get the first record.                                  |
+| `firstOrFail()`                                                     | Same as `first()`, but throws exception if none.       |
+| `firstOrCreate($attributes, $values = [])`                          | Get the first record matching attributes or create it. |
+| `updateOrCreate($attributes, $values = [])`                         | Update if exists, otherwise create.                    |
+| `where($column, $operator = null, $value = null, $boolean = 'and')` | Basic where query.                                     |
+| `orWhere(...)`                                                      | Add OR condition.                                      |
+| `whereIn($column, array $values)`                                   | WHERE IN query.                                        |
+| `whereBetween($column, array $range)`                               | WHERE BETWEEN query.                                   |
+| `whereNull($column)` / `whereNotNull($column)`                      | Check for NULL values.                                 |
+| `orderBy($column, $direction = 'asc')`                              | Order results.                                         |
+| `latest($column = 'created_at')` / `oldest()`                       | Shortcut for order by date.                            |
+| `limit($number)` / `take($number)`                                  | Limit result count.                                    |
+| `get($columns = ['*'])`                                             | Execute and get all results.                           |
+| `pluck($column, $key = null)`                                       | Extract a single column from results.                  |
+| `value($column)`                                                    | Get a single column value from the first record.       |
+| `exists()` / `doesntExist()`                                        | Boolean if records exist.                              |
+| `count()` / `min()` / `max()` / `avg()` / `sum()`                   | Aggregations.                                          |
+| `chunk($count, $callback)`                                          | Process records in batches.                            |
+| `cursor()`                                                          | Lazy-load large results.                               |
+| `paginate()` / `simplePaginate()`                                   | Pagination methods.                                    |
+
+
+
+## 🔗 3. Relationships (Laravel's Big Feature)
+
+| Method                                     | Description                               |
+| ------------------------------------------ | ----------------------------------------- |
+| `hasOne()`                                 | Define one-to-one relationship.           |
+| `hasMany()`                                | Define one-to-many relationship.          |
+| `belongsTo()`                              | Define inverse of one-to-one or many.     |
+| `belongsToMany()`                          | Define many-to-many relationship.         |
+| `morphOne()`                               | Polymorphic one-to-one.                   |
+| `morphMany()`                              | Polymorphic one-to-many.                  |
+| `morphTo()`                                | Polymorphic inverse relation.             |
+| `morphToMany()`                            | Polymorphic many-to-many.                 |
+| `morphedByMany()`                          | Define reverse polymorphic many-to-many.  |
+| `with($relations)`                         | Eager-load relationships.                 |
+| `load($relations)`                         | Lazy-load after query.                    |
+| `withCount($relations)`                    | Add relation counts.                      |
+| `whereHas($relation, $callback = null)`    | Filter models by related model existence. |
+| `has($relation)` / `doesntHave($relation)` | Relation existence queries.               |
+| `sync()`, `attach()`, `detach()`           | Manage many-to-many pivot tables.         |
+
+
+
+## 🧱 4. Attribute Handling
+
+| Feature                         | Syntax                                           | Description                  |
+| ------------------------------- | ------------------------------------------------ | ---------------------------- |
+| `$fillable`                     | `['name', 'email']`                              | Mass-assignable fields.      |
+| `$guarded`                      | `['id']`                                         | Non-assignable fields.       |
+| `$casts`                        | `['is_active' => 'boolean']`                     | Type casting for attributes. |
+| `$hidden` / `$visible`          | Hide or show specific attributes in arrays/JSON. |                              |
+| `$appends`                      | Add computed attributes in serialization.        |                              |
+| `get{AttributeName}Attribute()` | Define accessor (computed getter).               |                              |
+| `set{AttributeName}Attribute()` | Define mutator (setter).                         |                              |
+| `toArray()` / `toJson()`        | Convert model or collection to array/JSON.       |                              |
+| `fill(array $attributes)`       | Mass assign attributes to a model.               |                              |
+
+
+
+## ⏳ 5. Soft Deletes (Trait-Based)
+
+| Trait              | Methods                                   |
+| ------------------ | ----------------------------------------- |
+| `use SoftDeletes;` | Enables soft deletes (adds `deleted_at`). |
+| `withTrashed()`    | Include soft-deleted models.              |
+| `onlyTrashed()`    | Retrieve only soft-deleted models.        |
+| `restore()`        | Restore soft-deleted model.               |
+| `forceDelete()`    | Permanently delete a model.               |
+
+
+
+## 🪝 6. Model Events (Laravel Core Behavior)
+
+| Event Hooks             | Triggered When                    |
+| ----------------------- | --------------------------------- |
+| `creating`, `created`   | Before/after record is created.   |
+| `updating`, `updated`   | Before/after record is updated.   |
+| `saving`, `saved`       | Before/after create or update.    |
+| `deleting`, `deleted`   | Before/after delete.              |
+| `restoring`, `restored` | Before/after soft delete restore. |
+
+> These are registered via static `booted()` or `observe()` methods.
+
+
+
+## 🧩 7. Query Builder (Underlying Layer)
+
+Laravel's Eloquent uses the `Illuminate\Database\Query\Builder` underneath, which includes:
+
+| Method                                 | Description                        |
+| -------------------------------------- | ---------------------------------- |
+| `select()`, `addSelect()`              | Specify columns to select.         |
+| `join()`, `leftJoin()`, `rightJoin()`  | Table joins.                       |
+| `groupBy()`, `having()`, `havingRaw()` | Grouping and conditions.           |
+| `union()`                              | Combine queries.                   |
+| `insert()`, `update()`, `delete()`     | Direct query builder manipulation. |
+| `raw()` / `whereRaw()`                 | Raw SQL expressions.               |
+| `fromSub()`                            | Use subquery as table source.      |
+
+
+
+## 📊 8. Collection & Results Methods
+
+When you call `get()` or similar, Eloquent returns a `Collection` (extends `Illuminate\Support\Collection`).
+
+Common methods you'll use in Laravel:
+
+| Method                                               | Description                  |
+| ---------------------------------------------------- | ---------------------------- |
+| `map()`, `filter()`, `reject()`, `pluck()`, `each()` | Transform collections.       |
+| `isEmpty()`, `count()`                               | Inspect data.                |
+| `first()`, `last()`                                  | Retrieve first or last item. |
+| `contains()`, `unique()`, `sortBy()`                 | Utility methods.             |
+
+
+
+## 🧠 9. Scopes
+
+| Type                    | Syntax                                                   | Description                         |
+| ----------------------- | -------------------------------------------------------- | ----------------------------------- |
+| **Local scope**         | `public function scopeActive($query)` → `User::active()` | Reusable query condition in model.  |
+| **Global scope**        | Add via `protected static function booted()`             | Apply to all queries automatically. |
+| `withoutGlobalScopes()` | Disable scopes temporarily.                              |                                     |
+
+
+
+## ⚙️ 10. Miscellaneous / Advanced
+
+| Method                           | Description                         |
+| -------------------------------- | ----------------------------------- |
+| `getTable()` / `setTable()`      | Get or set the table name manually. |
+| `getKey()` / `getKeyName()`      | Get primary key value or name.      |
+| `isDirty()` / `wasChanged()`     | Check if model attributes changed.  |
+| `push()`                         | Save model and all related models.  |
+| `withDefault()`                  | Define default related model.       |
+| `makeHidden()` / `makeVisible()` | Modify visibility on-the-fly.       |
