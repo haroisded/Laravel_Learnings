@@ -28,6 +28,7 @@
   • you can also "define" your own "route file", that can group
     certain routes ( to avoid "web.php" getting bigger)
     e.g.. "admin routes( admin.php ), requests related to the admin"
+
     
  
 - You can "view all" application routes, using the "artisan cmd"...
@@ -166,12 +167,3 @@
 - You can clear/delete the cache file w/the command... 
 
   CMD {php artisan route:clear}  
-  
-
-  
-  
-  
-
-    
-
-
