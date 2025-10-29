@@ -141,8 +141,8 @@
  ( Code under "app.php" ):   
 
   then: function() { 
-   Route::prefix('transactions')
-   ->name('transactions.')
+   Route::prefix('Route_URI')
+   ->name('Route_Name')
    ->group(base_path('routes/{Routes_file}'));
   }
 
