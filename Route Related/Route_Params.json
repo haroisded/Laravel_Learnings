@@ -123,7 +123,7 @@
 
 ** ( REGEX w/Route Function Parameters ):  
 
-- the only way to strict type to your parameters is 
+- the only way to strict type your "route parameters" is 
   through "constraints" or "REGEX w/Method Chain", e.g..
   "Route::(...)->where( *query_name, *expression )"
 

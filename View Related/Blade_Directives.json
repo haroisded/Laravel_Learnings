@@ -1,0 +1,74 @@
+- - - ( Blade Directives ) - - -
+
+
+### 🧠 1. Control Structures ( https://chatgpt.com/s/t_6904748f85108191a2d69d9b172fc915 )
+
+| Directive                                              | Description                                 | Example                                                                             |
+| ------------------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `@if`, `@elseif`, `@else`, `@endif`                    | Conditional statements (like PHP `if`).     | `blade @if($user) Welcome, {{ $user->name }} @else Guest @endif `                   |
+| `@unless`                                              | Runs the block *if the condition is false*. | `blade @unless($user->isAdmin()) You are not an admin. @endunless `                 |
+| `@isset` / `@endisset`                                 | Checks if a variable is set.                | `blade @isset($records) {{ count($records) }} found. @endisset `                    |
+| `@empty` / `@endempty`                                 | Checks if a variable is empty.              | `blade @empty($posts) No posts yet. @endempty `                                     |
+| `@switch`, `@case`, `@break`, `@default`, `@endswitch` | Switch-case logic.                          | `blade @switch($role) @case('admin') Admin panel @break @default Guest @endswitch ` |
+
+
+
+### 🔁 2. Loops ( https://chatgpt.com/s/t_6904748f85108191a2d69d9b172fc915 )
+
+| Directive                           | Description                      | Example                                                                                   |
+| ----------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `@for`, `@endfor`                   | Traditional for loop.            | `blade @for($i = 0; $i < 3; $i++) {{ $i }} @endfor `                                      |
+| `@foreach`, `@endforeach`           | Loop over arrays or collections. | `blade @foreach($users as $user) {{ $user->name }} @endforeach `                          |
+| `@forelse`, `@empty`, `@endforelse` | Loop with an “empty” fallback.   | `blade @forelse($posts as $post) {{ $post->title }} @empty No posts @endforelse `         |
+| `@while`, `@endwhile`               | While loop.                      | `blade @while($count < 5) {{ $count++ }} @endwhile `                                      |
+| `@continue` / `@break`              | Skip or exit loop iteration.     | `blade @foreach($items as $item) @continue($item->hidden) {{ $item->name }} @endforeach ` |
+
+
+
+### 🔐 3. Authentication & Authorization
+
+| Directive                            | Description                                | Example                                                     |
+| ------------------------------------ | ------------------------------------------ | ----------------------------------------------------------- |
+| `@auth` / `@endauth`                 | Display content if user is authenticated.  | `blade @auth Welcome, {{ auth()->user()->name }} @endauth ` |
+| `@guest` / `@endguest`               | Display if user is *not* authenticated.    | `blade @guest Please log in. @endguest `                    |
+| `@can` / `@cannot` / `@endcan`       | Check permissions using Gates or Policies. | `blade @can('update', $post) Edit @endcan `                 |
+| `@role` / `@endrole` *(with Spatie)* | Show content for a specific role.          | `blade @role('admin') Admin Dashboard @endrole `            |
+
+
+
+### ⚙️ 5. PHP & Data Display
+
+| Directive          | Description                             | Example                            |
+| ------------------ | --------------------------------------- | ---------------------------------- |
+| `{{ $var }}`       | Echo escaped data (HTML-safe).          | `blade {{ $user->name }} `         |
+| `{!! $var !!}`     | Echo raw, unescaped HTML.               | `blade {!! $post->content !!} `    |
+| `@php` / `@endphp` | Run inline PHP.                         | `blade @php $count = 10; @endphp ` |
+| `@dump` / `@dd`    | Debug values (like `dump()` or `dd()`). | `blade @dd($users) `               |
+
+
+
+### 🧱 6. Layout Inheritance
+
+| Directive                  | Description                         | Example                                                      |
+| -------------------------- | ----------------------------------- | ------------------------------------------------------------ |
+| `@extends`                 | Extend a layout file.               | `blade @extends('layouts.app') `                             |
+| `@section` / `@endsection` | Define a section of content.        | `blade @section('title', 'Home Page') `                      |
+| `@yield`                   | Display a section placeholder.      | `blade <title>@yield('title')</title> `                      |
+| `@show`                    | End section and output immediately. | `blade @section('sidebar') Sidebar @show `                   |
+| `@parent`                  | Include parent section content.     | `blade @section('content') @parent Extra text. @endsection ` |
+| `@include`                 | Insert partials (reusable chunks).  | `blade @include('partials.nav') `                            |
+
+
+
+### 🎛️ 7. Miscellaneous
+
+| Directive              | Description                                | Example                                                                                  |
+| ---------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `@csrf`                | Adds a CSRF token input field (for forms). | `blade <form>@csrf</form> `                                                              |
+| `@method('PUT')`       | Spoof HTTP method in forms.                | `blade <form>@method('DELETE')</form> `                                                  |
+| `@error` / `@enderror` | Display validation errors for a field.     | `blade @error('email') <p>{{ $message }}</p> @enderror `                                 |
+| `@vite`                | Load assets via Vite.                      | `blade @vite(['resources/css/app.css', 'resources/js/app.js']) `                         |
+| `@env` / `@endenv`     | Conditional display by environment.        | `blade @env('local') Dev Mode @endenv `                                                  |
+| `@once` / `@endonce`   | Run content only once per render.          | `blade @once This appears once. @endonce `                                               |
+| `@push` / `@stack`     | Push scripts or styles into a stack.       | `blade @push('scripts') <script>...</script> @endpush `                                  |
+| `@inject`              | Inject a service or class instance.        | `blade @inject('metrics', 'App\Services\MetricsService') {{ $metrics->activeUsers() }} ` |
