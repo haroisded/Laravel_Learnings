@@ -1,6 +1,5 @@
 - - - ( Laravel Route Parameters ) - - -
 
-
 - There are some cases, where we would want to 
   access values passed to the URL, e.g.. 
   • /transactions/{ID} 
@@ -8,6 +7,9 @@
 
   we can do this by using "route parameters"
   ( can also be used w/the controller )   
+
+  Note: Use "Route Params", IF URL Endpoint values are 
+        needed ( e.g.. finding specific resource )
 
 
   ( Sample Code ):    

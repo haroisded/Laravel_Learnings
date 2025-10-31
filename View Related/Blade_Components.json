@@ -42,15 +42,18 @@
   both options allows passed data, to be used by the 
   component
   
-  • (Option1): 
+  • (Option1 & Option2): Class Component & Controller
     return view( *template_name , ["data" => "value"] )
   
 
-  • (Option2): 
+  • (Option3): Directly to Component 
     <x - *component_name 
      '*$key/attribute' = "{{ $value }}" //Reads Values as Strings 
      ':*$key/attribute' = "$value" //Reads Values as PHP syntax / PHP expressions, etc.. 
     />
+
+  //Note: Option3 needs to rely on Option2, to make it dynamic
+  //      Option3 can rely on Option1, for default data, rather than dynamic
      
 
 

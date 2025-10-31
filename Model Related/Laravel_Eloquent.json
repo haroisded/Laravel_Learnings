@@ -55,10 +55,10 @@
   
 
 
-** ( Eloquent Configurations ):    
+** ( Eloquent Model Conventions ):    
 
 - The "Method 2", in the "Understanding Eloquent", is an example of 
-  "Eloquent Model/Table Configuration", below are more samples related to it 
+  "Eloquent Model Conventions", below are more samples related to it 
 
   for more indepth samples, you can visit here...
   https://laravel.com/docs/12.x/eloquent#eloquent-model-conventions

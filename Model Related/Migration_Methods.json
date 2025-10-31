@@ -1,0 +1,124 @@
+- - - ( Migration Methods ) - - -
+
+## ⚙️ 1. Schema Builder Commands ( https://chatgpt.com/s/t_69034936710481919c8edd1a66962699 )
+
+| Method                                                                     | Description                           | Example                                                              |
+| -------------------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------- |
+| `Schema::create($table, $callback)`                                        | Create a new table.                   | `php Schema::create('users', function (Blueprint $table) { ... }); ` |
+| `Schema::table($table, $callback)`                                         | Modify an existing table.             | `php Schema::table('users', function (Blueprint $table) { ... }); `  |
+| `Schema::rename($from, $to)`                                               | Rename a table.                       | `Schema::rename('users', 'members');`                                |
+| `Schema::drop($table)`                                                     | Drop a table.                         | `Schema::drop('users');`                                             |
+| `Schema::dropIfExists($table)`                                             | Drop if it exists (avoids errors).    | `Schema::dropIfExists('users');`                                     |
+| `Schema::hasTable($table)`                                                 | Check if a table exists.              | `Schema::hasTable('users');`                                         |
+| `Schema::hasColumn($table, $column)`                                       | Check if a column exists.             | `Schema::hasColumn('users', 'email');`                               |
+| `Schema::disableForeignKeyConstraints()` / `enableForeignKeyConstraints()` | Temporarily disable/enable FK checks. | Use before/after truncating tables.                                  |
+
+
+
+## 🧩 2. Common Column Types
+
+| Method                                                                 | Description                                | Example                                         |
+| ---------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------- |
+| `$table->id()`                                                         | Auto-incrementing primary key (bigint).    | `id()`                                          |
+| `$table->bigIncrements('id')`                                          | Unsigned BIGINT auto-ID.                   | `bigIncrements('id')`                           |
+| `$table->increments('id')`                                             | Unsigned INT auto-ID.                      | `increments('id')`                              |
+| `$table->uuid('id')`                                                   | UUID primary key.                          | `uuid('id')`                                    |
+| `$table->ulid('id')`                                                   | ULID primary key.                          | `ulid('id')`                                    |
+| `$table->foreignId('user_id')`                                         | BIGINT FK column.                          | `foreignId('user_id')->constrained();`          |
+| `$table->foreignUuid('user_id')`                                       | UUID FK column.                            | `foreignUuid('user_id')->constrained('users');` |
+| `$table->string('name', 255)`                                          | VARCHAR column.                            | `string('name', 100)`                           |
+| `$table->text('bio')`                                                  | TEXT column.                               | `text('bio')`                                   |
+| `$table->mediumText('content')` / `$table->longText('body')`           | Larger text fields.                        | `longText('body')`                              |
+| `$table->integer('age')` / `$table->bigInteger('views')`               | Integer column types.                      | `integer('count')->unsigned();`                 |
+| `$table->unsignedInteger('count')`                                     | Positive integer only.                     |                                                 |
+| `$table->decimal('price', 8, 2)`                                       | Fixed-point numeric.                       | `decimal('price', 8, 2)`                        |
+| `$table->float('rating', 8, 2)`                                        | Floating-point numeric.                    | `float('rating', 5, 2)`                         |
+| `$table->boolean('is_active')`                                         | TRUE/FALSE value.                          | `boolean('is_active')->default(false)`          |
+| `$table->enum('role', ['user', 'admin'])`                              | ENUM type.                                 | `enum('role', ['admin', 'user'])`               |
+| `$table->json('options')` / `$table->jsonb('data')`                    | JSON column.                               | `json('settings')`                              |
+| `$table->date('birthday')` / `$table->time('open_time')`               | Date/time columns.                         |                                                 |
+| `$table->dateTime('published_at')` / `$table->timestamp('created_at')` | Full date/time stamps.                     |                                                 |
+| `$table->year('founded')`                                              | YEAR type.                                 |                                                 |
+| `$table->binary('photo')`                                              | Binary data.                               |                                                 |
+| `$table->ipAddress('visitor_ip')`                                      | IPv4/IPv6 address.                         |                                                 |
+| `$table->macAddress('device_mac')`                                     | MAC address.                               |                                                 |
+| `$table->rememberToken()`                                              | Adds nullable `remember_token` (for auth). |                                                 |
+| `$table->timestamps()`                                                 | Adds `created_at` and `updated_at`.        |                                                 |
+| `$table->softDeletes()`                                                | Adds `deleted_at` (for soft delete).       |                                                 |
+| `$table->nullableTimestamps()`                                         | Same as timestamps but nullable.           |                                                 |
+| `$table->morphs('imageable')`                                          | Adds `{imageable_id}`, `{imageable_type}`. | For polymorphic relations.                      |
+| `$table->uuidMorphs('taggable')` / `$table->ulidMorphs('mediaable')`   | Polymorphic with UUID/ULID keys.           |                                                 |
+
+
+
+## 🧱 3. Column Modifiers
+
+| Modifier                                                     | Description                         | Example                                                   |
+| ------------------------------------------------------------ | ----------------------------------- | --------------------------------------------------------- |
+| `->nullable()`                                               | Allow NULL values.                  | `$table->string('middle_name')->nullable();`              |
+| `->default($value)`                                          | Set a default value.                | `$table->boolean('is_active')->default(true);`            |
+| `->unsigned()`                                               | Unsigned numeric column.            | `$table->integer('views')->unsigned();`                   |
+| `->unique()`                                                 | Enforce unique constraint.          | `$table->string('email')->unique();`                      |
+| `->index()`                                                  | Add a basic index.                  | `$table->string('status')->index();`                      |
+| `->primary()`                                                | Set as primary key.                 | `$table->string('code')->primary();`                      |
+| `->comment('text')`                                          | Add a DB comment.                   | `$table->text('bio')->comment('User biography');`         |
+| `->useCurrent()`                                             | Default to current timestamp.       | `$table->timestamp('created_at')->useCurrent();`          |
+| `->useCurrentOnUpdate()`                                     | Auto-update on changes.             | `$table->timestamp('updated_at')->useCurrentOnUpdate();`  |
+| `->after('column')`                                          | Place column after another (MySQL). | `$table->string('nickname')->after('name');`              |
+| `->first()`                                                  | Place column first.                 | `$table->string('title')->first();`                       |
+| `->storedAs($expression)` / `->virtualAs($expression)`       | Generated (computed) columns.       | `$table->integer('total')->storedAs('price * quantity');` |
+| `->charset('utf8mb4')` / `->collation('utf8mb4_unicode_ci')` | Override charset/collation.         |                                                           |
+| `->from($value)` / `->to($value)`                            | Range for column types (rare).      |                                                           |
+
+
+
+## 🔑 4. Foreign Keys & Relationships
+
+| Method                                        | Description                           | Example                                                             |
+| --------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------- |
+| `$table->foreign('user_id')`                  | Create a foreign key constraint.      | `$table->foreign('user_id')->references('id')->on('users');`        |
+| `->references('id')->on('table')`             | Define target column & table.         |                                                                     |
+| `->onDelete('cascade')`                       | Delete child when parent deleted.     | `$table->foreignId('user_id')->constrained()->onDelete('cascade');` |
+| `->onUpdate('cascade')`                       | Cascade updates.                      |                                                                     |
+| `->constrained('table')`                      | Shortcut for foreign key.             | `$table->foreignId('user_id')->constrained('users');`               |
+| `$table->dropForeign(['user_id'])`            | Drop foreign key.                     |                                                                     |
+| `$table->dropConstrainedForeignId('user_id')` | Drop FK created with `constrained()`. |                                                                     |
+
+
+
+## 🧹 5. Table & Column Operations
+
+| Method                                                                             | Description               |
+| ---------------------------------------------------------------------------------- | ------------------------- |
+| `$table->renameColumn('old', 'new')`                                               | Rename a column.          |
+| `$table->dropColumn('column')`                                                     | Drop one column.          |
+| `$table->dropColumn(['a', 'b'])`                                                   | Drop multiple columns.    |
+| `$table->dropPrimary($indexName = null)`                                           | Drop primary key.         |
+| `$table->dropUnique($indexName)` / `$table->dropIndex()` / `$table->dropForeign()` | Drop various constraints. |
+
+
+
+## 🧭 6. Index Types
+
+| Method                                        | Description                      |
+| --------------------------------------------- | -------------------------------- |
+| `$table->primary('id')`                       | Set primary key.                 |
+| `$table->unique('email')`                     | Unique index.                    |
+| `$table->index('status')`                     | Regular index.                   |
+| `$table->fullText('content')`                 | Fulltext index (MySQL/Postgres). |
+| `$table->spatialIndex('location')`            | Spatial index (geometry).        |
+| `$table->foreignId('user_id')->constrained()` | Adds index + FK.                 |
+
+
+
+## ⚡ 7. Miscellaneous Schema Utilities
+
+| Method                                          | Description                              |
+| ----------------------------------------------- | ---------------------------------------- |
+| `php artisan make:migration create_users_table` | Create a new migration file.             |
+| `php artisan migrate`                           | Run all pending migrations.              |
+| `php artisan migrate:rollback`                  | Undo last batch.                         |
+| `php artisan migrate:refresh`                   | Roll back & re-run all migrations.       |
+| `php artisan migrate:fresh`                     | Drop all tables & re-run all migrations. |
+| `php artisan migrate:status`                    | Show migration status.                   |
+| `php artisan schema:dump`                       | Create SQL dump of schema.               |
