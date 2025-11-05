@@ -1,4 +1,7 @@
-- - - ( Laravel Helpers ) - - -
+- - - ( Laravel Helpers & Strings ) - - -
+
+
+*** ( Laravel Helpers ): 
 
 - These are built-in global functions that make common tasks easier,
   you can use them anywhere in your app without importing anything
@@ -8,7 +11,6 @@
 • Reduce boilerplate code
 • Keep your logic consistent across the app
 • Improve readability and maintainability
-
 
 
 ** ( Sample list of Helpers ):  
@@ -24,6 +26,15 @@
 • e($value)	Escape HTML for safe output.
 
 
-
 ** ( Full list of Helpers ): 
-• https://laravel.com/docs/12.x/helpers#
+• https://laravel.com/docs/12.x/helpers
+
+
+
+
+*** ( Laravel Strings ):  
+
+- Laravel includes a variety of functions for manipulating string values.
+
+** ( Full list of Strings ):  
+• https://laravel.com/docs/12.x/strings

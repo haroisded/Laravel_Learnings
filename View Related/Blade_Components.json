@@ -4,8 +4,8 @@
   cleaner & modular templates ( like a mini HTML page )
 
   this can be created w/...
-  CMD #1: { php artisan make:component *component_name }
-  CMD #2: { php artisan make:component *component_name --view }    
+  CMD #1: { php artisan make:component *component-name }
+  CMD #2: { php artisan make:component *component-name --view }    
   (e.g.. component name, "Nav")
 
   the "CMD #1", creates 2 Files, the "component's class" & the "component's view",
@@ -20,6 +20,11 @@
   (Note): 
   • The 1st time that "this" command is used, is where the "component directories" 
     will be created ( again, under "app" & "resources")  
+
+  • its mandatory for "component view files" to be created with a "kebab-case", e.g..
+    "users-data-output.blade.php"
+    ( component class names aren't allowed w/kebab-case, so change the name
+      of the class, one that matches matches its "file name" )
 
 
 
