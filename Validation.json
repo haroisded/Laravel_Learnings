@@ -1,48 +1,102 @@
- - - - ( Laravel Validation ) - - -
-
-** ( Return Type Declaration ): https://chatgpt.com/s/t_690ef53f2f0c8191a09845f4fb9ed7c4
+- - - ( Laravel Validation ) - - - 
 
 
-** ( Validation Use-case Intro ):  
+### {"Main-Concept: Intro & Use-Case"}  
 
-- Example: we have a "store method", in where we will apply and use the "validate method",
-  validate method, is provided by the "Illuminate\Http\Request"
-
- IF: 
- validation rules pass, code will keep executing normally 
-
- ELSE:
- an "Illuminate\Validation\ValidationException" exception
- will be thrown & the proper error response will automatically
- be sent back to the user
-
- Example Exception(1): "traditional HTTP request"
- a redirect response to the previous URL will be generated
-
- Example Exception(2): "XHR request"
- a JSON response containing the validation error messages will be returned.
-
- ( Practice this in the house later ):
+- Validate method, is provided by the "Illuminate\Http\Request"
 
 
+- Example: 
+we have a "store method", in where we will apply and use the "validate method",
 
-* ( Sample Validation Logic ):
+IF: 
+validation rules pass, code will keep executing normally 
+
+ELSE:
+an "Illuminate\Validation\ValidationException" exception
+will be thrown & the proper error response will automatically
+be sent back to the user
+
+Example Exception(1): "traditional HTTP request"
+a redirect response to the previous URL will be generated
+
+Example Exception(2): "XHR request"
+a JSON response containing the validation error messages will be returned.
+
+
+
+### {"Main-Concept: Code Example"}
 
 public function store(Request $request): RedirectResponse
 {
-    $validated = $request->validate([
-        'title' => 'required|unique:posts|max:255',
-        'body' => 'required',
-    ]);
- 
-    // The blog post is valid...
- 
-    return redirect('/posts');
+  $validated = $request->validate([
+      'title' => 'required|unique:posts|max:255',
+      'body' => 'required',
+  ]);
+
+  // The blog post is valid...
+
+  return redirect('/posts');
 }
 
 
 
-* ( A Note on Optional Fields ):  
+### {"Main-Concept: Method Rules & Notes"}
+
+("Note: Available Validation Rules")
+
+- Full list of Validation Rules: 
+  https://laravel.com/docs/12.x/validation#available-validation-rules
+
+
+- In laravel, there are also rules that't can't co-exist w/each other, in which 
+  you can check here, https://chatgpt.com/s/t_691228086e748191b15ec4e81fd2a2e7
+
+
+- Conditionally Adding Rules... 
+
+• {exclude_if}:   
+
+  not validate a given field if another field has a given value
+
+  return [
+    'has_appointment' => 'required|boolean',
+    'appointment_date' => 'exclude_if:has_appointment,false|required|date',
+    'doctor_name' => 'exclude_if:has_appointment,false|required|string',
+  ];
+
+
+• {exclude_unless}:   
+
+  not validate a given field unless another field has a given value
+
+  return  [
+    'has_appointment' => 'required|boolean',
+    'appointment_date' => 'exclude_unless:has_appointment,true|required|date',
+    'doctor_name' => 'exclude_unless:has_appointment,true|required|string',
+  ]);
+
+
+• {exclude_unless}:   
+
+  checks a field only if that field is present in the data being validated
+
+   return  [
+    'email' => 'sometimes|required|email',
+  ]);
+
+
+
+
+("Note: Return Type Declaration"): 
+
+- https://chatgpt.com/s/t_690ef53f2f0c8191a09845f4fb9ed7c4
+// Strict typing, helpful for input validation 
+// in terms of increasing data type value strictness  
+
+
+
+("Rule: Optional Fields"):
 
 - for optional fields, mark "optional" request fields 
   as nullable, to consider null values as valid
@@ -55,8 +109,7 @@ $request->validate([
 
 
 
-
-** ( Validation Error ):  
+("Note: Validation Error"):  
 
 - IF: "requests fields", do not pass given validation rules...
 → Laravel redirects user to previous location
@@ -75,132 +128,383 @@ $request->validate([
 
 
 
-* ( @error directive ):   
+
+## {"Sub-Concept: @error directive"}
 
 - this "directive" can be used, to "quickly" determine if 
-  "validation error messages" exists for a given "attribute"
+"validation error messages" exists for a given "attribute"
 
-  Within an "@error directive", you may echo the "$message var"
-  to display the "error message"
-
-  
-  ( Example ):   
-
-  // Using directive in views or components 
-  // note: is-invalid, just turns the input label red
-
-  <label for="title">Post Title</label>
- 
-  <input type="text" name="title" class="@error('title') is-invalid @enderror"/>
-  
-  @error('title')
-      <div class="alert alert-danger">{{ $message }}</div>
-  @enderror
+Within an "@error directive", you may echo the "$message var"
+to display the "error message"
 
 
+( Example ):   
+
+// Using directive in views or components 
+// note: is-invalid, just turns the input label red
+
+<label for="title">Post Title</label>
+
+<input type="text" name="title" class="@error('title') is-invalid @enderror"/>
+
+@error('title')
+    <div class="alert alert-danger">{{ $message }}</div>
+@enderror
 
 
-** ( Repopulating Forms ):  
+
+## {"Sub-Concept: Repopulating Forms"}
 
 - When Laravel generates a redirect response due to a validation error
-
-  // Continue after learning Laravel "Sessions"
-
+// Continue after learning Laravel "Sessions"
 
 
 
-** ( Form Request Validation ):  
+## {"Sub-Concept: Form Request Validation File && Authorize Method"}
 
 - for more complex validation scenarios, you may wish to create a "form request"
 
-  "Form requests", are "custom request classes" that "encapsulates" their own 
-  "validation" & "authorization" logic
+"Form requests", are "custom request classes" that "encapsulates" their own 
+"validation" & "authorization" logic
 
-  the "command" to create one... CMD: {php artisan make:request *FileName}
-  // this is stored in "app/Http/Requests directory", which is only present when
-  // make:request is run once
+the "command" to create one... CMD: {php artisan make:request *FileName}
+// this is stored in "app/Http/Requests directory", which is only present when
+// make:request is run once
 
 
 -  Each form request generated by Laravel has two "methods"...
 
-  • ( authorize method, Invoked First ):     
-    responsible for determining if currently authenticated 
-    user performs an action, represented by request 
-    {"this method returns a boolean"}
+• ( authorize method, Invoked First ):  
 
-  • ( rules method,  Invoked Last ):
-    returns validation rules that should apply to the request's data
+  responsible for determining if currently authenticated 
+  user performs an action, represented by request 
+  ( this method returns a boolean )
 
-    these methods are invoked, when the "request" reaches the controller,
-    where the "request file's namespace" is "typehinted"
-    {"this method returns the validated request values"}
-  
+
+• ( rules method,  Invoked Last ):
+
+  returns validation rules that should apply to the request's data
+
+  these methods are invoked, when the "request" reaches the controller,
+  where the "request file's namespace" is "typehinted"
+  ( this method returns the validated request values )
+
   e.g.. {public function store(StorePostRequest $request)}
 
-
+|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Step / Method            | Fail (`false` / invalid)                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | **authorize()**          | Returns `false` → request stops immediately, **403 Forbidden**. Controller never called.                                  |
 | **rules() / validation** | Any field fails → Laravel **redirects back** (web) or returns **422** (API). Errors are flashed; controller never called. |
+|------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
+- For More authorize method info: https://laravel.com/docs/12.x/validation#authorizing-form-requests
 
 
 - In order to get the values of the "validated request", you can
   call the "$validated = $request->validated()" in your controller 
 
 
-  ( Example Code ):   
+
+( Example Code ):   
+
+{The StorePostRequest file}:
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StorePostRequest extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
+        // sample: return auth()->user()->id === $this->post->user_id;
+    }
+
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'gender'  => 'required|string',
+            'user_id' => 'required|integer|exists:user,id',
+        ];
+    }
+}
+
+
   
-  {"The StorePostRequest file"}
+{The Controller file}:
 
-  namespace App\Http\Requests;
+namespace App\Http\Controllers;
 
-  use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\StorePostRequest;
 
-  class StorePostRequest extends FormRequest
+class UserController extends Controller
+{
+    public function store(StorePostRequest $request)
+    {
+        // The request is already authorized and validated
+
+        // Get all validated data as an assoc array
+        $validated = $request->validated();
+
+        // Pass the validated data to a view
+        return view('users.show', ['data' => $validated]);
+    }
+}
+
+
+
+# {"Supporting Concept: Form Request File Note "}
+
+- returned values by the methods in this file are 
+  not handled by the controller, rather
+  
+  it is handled internally by Laravel's classes 
+
+  
+- the purpose of the file, is to only modify, filter
+  & validate "request data" 
+
+
+
+# {"Supporting Concept: Method Sequence"}
+
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Method                       | When Used                                      | Purpose / What It Does                                                                             |
+| :--------------------------- | :----------------------------------------------| -------------------------------------------------------------------------------------------------  |
+| **`authorize()`**            |  Runs **first**                                | Determines if the user is allowed to make this request. Must return `true` or `false`.             |
+| **`prepareForValidation()`** |  Before validation                             | Preprocess / sanitize input before rules are applied. Use `$this->merge()` or `$this->replace()`.  |
+| **`rules()`**                |  During validation setup                       | Defines validation rules for incoming request data.                                                |
+| **`messages()`**             |  During validation setup                       | Defines **custom error messages** for specific rules.                                              |
+| **`attributes()`**           |  During validation setup                       | Defines **custom attribute names** (replaces keys in error messages like `title` → “Post Title”).  |
+| **`after()`**                |  After initial validation (but before success) | Adds additional *post-validation checks* using callbacks (e.g., complex or dependent validations). |
+| **`passedValidation()`**     |  Runs after validation succeeds                | Modify or format validated data right before controller gets it.                                   |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
+
+# {"Supporting Concept: Safe Method"} 
+
+- the method used to get values, from validated data, 
+  stored in a {Form Request Validation File} 
+
+- For More Info: https://laravel.com/docs/12.x/validation#working-with-validated-input
+
+|--------------------------------------------------------------------------------------------------------------------|
+| Method                   | Description                                                                             |
+| ------------------------ | -------------------------------------------------------------------------               |
+| `$request->safe()`       | Returns a `ValidatedInput` instance holding all validated data.                         |
+| `->all()`                | Returns **all validated data** as an array (same as `validated()` array).               |
+| `->only([...])`          | Returns **only the specified validated keys**.                                          |
+| `->except([...])`        | Returns **all validated keys except the ones specified**.                               |
+| `->merge([...])`         | Merge additional Key / Value or overwrite data value into the validated key value       |
+| `->has('key')`           | Check if a validated key exists ( returns a bool )                                      |
+| `->get('key', $default)` | Get specific validated key, if non-existent, return provided default value ( optional ) |
+|--------------------------------------------------------------------------------------------------------------------|
+
+
+
+# {"Supporting Concept: Validation Properties"}
+
+|-----------------------------------------------------------------------------------------------------------------------------------------|
+| **Property**          | **Purpose**                                                         | **Example**                               |
+| --------------------- | ------------------------------------------------------------------- | ----------------------------------------- |
+| `$stopOnFirstFailure` | Stop validating further rules after the **first validation error**. | `protected $stopOnFirstFailure = true;`   |
+| `$redirect`           | Redirect to a **specific URI** if validation fails.                 | `protected $redirect = '/dashboard';`     |
+| `$redirectRoute`      | Redirect to a **named route** if validation fails.                  | `protected $redirectRoute = 'dashboard';` |
+| `$errorBag`           | Customize the **error bag name** used when flashing errors.         | `protected $errorBag = 'loginErrors';`    |
+|-----------------------------------------------------------------------------------------------------------------------------------------|
+
+
+
+# {"Supporting Concept: Performing Additional Validation"}
+
+- Explanation: 
+  https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221ywMCrpKJttAD8-oV2XNk2g-r4xrYPv1S%22%5D,%22action%22:%22open%22,%22userId%22:%22110510960089098252970%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
+
+
+
+# {"Supporting Concept: Customizing the Error Messages"}
+
+- You may customize the "error messages" used by 
+  by "adding" and "overriding" the "messages method",
+  in the "Form Request File"
+
+
+  ( Code Example ):
+
+  public function messages(): array
   {
-      public function authorize()
-      {
-          return true;
-          // sample: return auth()->user()->id === $this->post->user_id;
-      }
-
-      public function rules()
-      {
-          return [
-              'name' => 'required|string|max:255',
-              'gender'  => 'required|string',
-              'user_id' => 'required|integer|exists:user,id',
-          ];
-      }
+      return [
+          '*key.*rule' => 'Custom Error Message',
+          '*key.*rule' => 'Custom Error Message',
+      ];
   }
+
+
+
+# {"Supporting Concept: prepareForValidation Method"}
+
+- prepare or sanitize any data from the request 
+  before you applying validation rules
+
+
+  ( Code Example ):
+
+  use Illuminate\Support\Str;
+  
+  /**
+  * Prepare the data for validation.
+  */
+  protected function prepareForValidation(): void
+  {
+      $this->merge([
+          'name' => Str::slug($this->name),
+          'age' => $this->age + 1,
+      ]);
+  }
+
+
+
+# {"Supporting Concept: passedValidation() Method"}
+
+- is invoked only after all validation has successfully completed
+
+- Note: 
+  the "replace()", is part of the "Request instance", it's used
+  to "replace" the "array data", with a "new array data"
+  ( completely deleting the "old array data" )
+        
+
+  ( Code Example ):
+
+  /**
+  * Handle a passed validation attempt.
+  */
+  protected function passedValidation(): void
+  {
+      $this->replace(['name' => 'Taylor']);
+  }
+
+
+
+# {"Supporting Concept: Complex Conditional Validation Non - Array & Array"}
+
+- Sometimes you may wish to add validation rules based on more 
+  complex conditional logic, in this case we'll use the...
+  • "withValidator Method"
+  • "Validator Instance"
+  • "sometimes method"
+
+
+- in the "sometimes method", there are three parameters...
+  • {1st Parameter}, name of the field where we wish to add a new rule 
+  • {2nd Parameter}, the rule we want to add
+  • {3rd Parameter}, the closure, that decides to apply the rule in the field,
+                     by returning a boolean
+
+
+- Note: 
+
+1) In terms of some rules that can't co exist with each other,
+   rules that are added conditionally, replaces the rule that 
+   they can't co - exist with  
+   
+   if its not the case, it is simply added to the field, as an 
+   another rule, listed in ("Note: Available Validation Rules")
+
+
+2) The only way for a "sometimes method", to access "request",
+   data, is through the "$input var", or any variable passed 
+  in the callback's parameter
+
+
+
+  ( Example Code, "Non - Array" ):   
+
+  public function rules(): array
+  {
+      return [
+          'email' => 'nullable|email',
+          'games' => 'nullable|integer|min:0',
+      ];
+  }
+
+  
+
+  public function withValidator(Validator $validator): void
+  {
+     // Single Conditional Rule 
+     $validator->sometimes('email', 'max:500', function ($input) {
+          return $input->games >= 100;
+      }); 
+      // if returned "true", temporarily...
+      // email's field rule = nullable|email|max:500
+
+
+      // Multiple conditional rules
+      $validator->sometimes(['email', 'games'], 'required', function ($input) {
+          return $input->games >= 100;
+      });
+      // if returned "true", temporarily... 
+      // email's field rule = required|email|max:500
+      // games's field rule = required|integer|min:0
+  }
+
+
+
+  ( Example Code, "Array" ):
+
+    $input = [
+      'channels' => [
+        [
+          'type' => 'email',
+          'address' => 'abigail@example.com',
+        ],
+        [
+          'type' => 'url',
+          'address' => 'https://example.com',
+        ],
+      ],
+    ];
+    // In case if the request, contained an Assoc_arry Key/Value pair
+    // that has its duplicate keys, this is the request data structure
 
 
     
-  {"The Controller file"}
+    public function rules(): array
+    {
+        return = [
+          'channels.*.type' => 'required|string',
+          'channels.*.address' => 'required|string', 
+        ];
+    }
+    // "Asterisk = Wildcard", meaning the rule is applied
+    // to all keys that matches the name of the right side 
+    // of the asterisk
 
-  namespace App\Http\Controllers;
-
-  use App\Http\Requests\StorePostRequest;
-
-  class UserController extends Controller
-  {
-      public function store(StorePostRequest $request)
-      {
-          // The request is already authorized and validated
-
-          // Get only the validated data
-          $validated = $request->validated();
-
-          // Pass the validated data to a view
-          return view('users.show', ['data' => $validated]);
-      }
-  }
+    // Otherwise use index, 'channels.0.type', to apply specifically 
 
 
 
+    public function withValidator($validator)
+    {
+
+      $validator->sometimes('channels.*.address', 'nullable|email', function ($input, $item) {
+          return $item->type === 'email';
+      });
 
 
-  
-  
+      $validator->sometimes('channels.*.address', 'nullable|url', function ($input, $item) {
+          return $item->type === 'url';
+      });
 
+    }
+    // The 1st, 2nd and 3rd parameters, is still the same, except for the "$item var",
+    // the $item var, is responsible for itterating over the "Channels index"
 
+    // the 1st validator, "$item var" is pointing to "index:0", of "channels array"
+    // the 2nd validator, "$item var" is pointing to "index:1", of "channels array"
